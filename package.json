@@ -1,0 +1,21 @@
+{
+  "name": "openchainclaw",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Transparent local-first AI assistant prototype with verifiable audit logs.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "ai-agent",
+    "audit-log",
+    "local-first",
+    "web3"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -100,6 +100,38 @@ OpenChainClaw 不是单纯更强的 AI 助手，而是一个让个人 AI 助手�
 - 文件修改可以回滚；
 - 链上记录用于证明，而不是泄露数据。
 
+## Current Prototype
+
+V0.1 prototype now includes a no-dependency local console and local runtime:
+
+- create a task from the local Web console;
+- record a task timeline with file read, file modify, risk review, approval, web visit, API call and proof events;
+- block hidden or sensitive file reads by default;
+- pause high-risk non-whitelisted web access until user approval;
+- create a snapshot before text file modification;
+- show file diff and support rollback;
+- generate a deterministic local audit hash;
+- write a local verifiable ledger record that stands in for the MVP chain submission queue.
+
+The current runtime is deliberately deterministic. It demonstrates the audit, risk, rollback and proof flow before real model orchestration, real browser automation, wallet signing or public-chain submission are added.
+
+## Quickstart
+
+Prerequisite: Node.js 20 or newer.
+
+```bash
+npm test
+npm start
+```
+
+Then open:
+
+```text
+http://127.0.0.1:4173
+```
+
+Local audit data is written under `.openchainclaw/`; the demo editable workspace is written under `data/workspace/`. Both paths are ignored by git.
+
 ## Documentation
 
 - [License](LICENSE)
@@ -160,10 +192,11 @@ OpenChainClaw 第一版明确不做：
 
 ## Project Status
 
-当前仓库处于 **PRD and architecture planning** 阶段。下一步重点是：
+当前仓库处于 **V0.1 local prototype** 阶段。下一步重点是：
 
-1. 基于本地产品需求制定技术方案；
-2. 确定本地日志、哈希和链上记录的数据结构；
-3. 设计本地 Web 控制台核心页面；
-4. 制定 V0.1 原型开发范围；
-5. 准备早期用户试用脚本和反馈问卷。
+1. 将 demo runtime 替换为真实最小 agent planning/execution loop；
+2. 补授权目录、网站白名单和偏好管理的写入界面；
+3. 增加真实网页抓取与 API 调用适配器；
+4. 将本地可验证账本扩展为链上提交队列；
+5. 增加钱包连接和高风险操作签名摘要；
+6. 准备早期用户试用脚本和反馈问卷。

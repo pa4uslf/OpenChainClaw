@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>OpenChainClaw Console</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2315222e'/%3E%3Cpath d='M8 18c5-9 11-9 16 0-5 6-11 6-16 0Z' fill='%238dd6ca'/%3E%3Ccircle cx='16' cy='17' r='3' fill='%2315222e'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">OpenChainClaw</p>
+        <h1>透明审计控制台</h1>
+      </div>
+      <div class="status-strip">
+        <span id="task-count">0 tasks</span>
+        <span id="ledger-count">0 proofs</span>
+      </div>
+    </header>
+
+    <main class="shell">
+      <section class="panel command-panel" aria-label="Task command">
+        <form id="task-form" class="task-form">
+          <label for="task-input">新任务</label>
+          <div class="command-row">
+            <textarea id="task-input" name="prompt" rows="3">演示一次带审计、快照、确认和本地证明的文件任务</textarea>
+            <button type="submit">运行</button>
+          </div>
+        </form>
+        <div class="preferences">
+          <div>
+            <span class="label">授权目录</span>
+            <code id="workspace-dir">-</code>
+          </div>
+          <div>
+            <span class="label">网页白名单</span>
+            <code id="web-whitelist">-</code>
+          </div>
+        </div>
+      </section>
+
+      <section class="layout">
+        <aside class="panel history-panel" aria-label="Task history">
+          <div class="panel-heading">
+            <h2>任务历史</h2>
+          </div>
+          <div id="task-list" class="task-list"></div>
+        </aside>
+
+        <section class="panel timeline-panel" aria-label="Timeline">
+          <div class="panel-heading">
+            <div>
+              <h2>任务时间线</h2>
+              <p id="selected-task-meta" class="muted">暂无任务</p>
+            </div>
+            <span id="selected-task-status" class="chip">idle</span>
+          </div>
+          <div id="approval-box" class="approval-box hidden"></div>
+          <div id="timeline" class="timeline empty">暂无时间线</div>
+        </section>
+
+        <aside class="panel report-panel" aria-label="Audit report">
+          <div class="panel-heading">
+            <h2>审计报告</h2>
+          </div>
+          <div id="report" class="report empty">任务完成后生成报告</div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
