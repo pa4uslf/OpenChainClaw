@@ -2,7 +2,7 @@
 
 > A transparent, local-first, Web3-verifiable personal AI assistant.
 
-[![Status](https://img.shields.io/badge/status-planning-blue)](#roadmap)
+[![Status](https://img.shields.io/badge/status-V0.1%20prototype-blue)](#project-status)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 [![Local First](https://img.shields.io/badge/local--first-by%20default-6f42c1)](#privacy-and-safety)
 
@@ -105,7 +105,7 @@ OpenChainClaw 不是单纯更强的 AI 助手，而是一个让个人 AI 助手�
 V0.1 prototype now includes a no-dependency local console and local runtime:
 
 - create a task from the local Web console;
-- record a task timeline with file read, file modify, risk review, approval, web visit, API call and proof events;
+- record a task timeline with file read, file modify, risk review, approval, simulated web visit, simulated API call and proof events;
 - block hidden or sensitive file reads by default;
 - pause high-risk non-whitelisted web access until user approval;
 - create a snapshot before text file modification;
@@ -114,6 +114,14 @@ V0.1 prototype now includes a no-dependency local console and local runtime:
 - write a local verifiable ledger record that stands in for the MVP chain submission queue.
 
 The current runtime is deliberately deterministic. It demonstrates the audit, risk, rollback and proof flow before real model orchestration, real browser automation, wallet signing or public-chain submission are added.
+
+Current prototype limitations:
+
+- no real LLM planning or model calls yet;
+- no real browser automation or live webpage extraction yet;
+- no real external API execution yet;
+- no wallet connection or wallet signature flow yet;
+- no public-chain submission yet.
 
 ## Quickstart
 
@@ -140,16 +148,16 @@ Local audit data is written under `.openchainclaw/`; the demo editable workspace
 
 ### V0.1 Prototype
 
-- 本地 Web 控制台；
-- 最小 Agent Runtime；
-- 文件读取和文件修改；
-- 文件修改前快照；
-- 操作时间线；
-- 本地审计日志；
-- 本地日志哈希；
-- 高风险操作确认；
-- 审计报告；
-- 本地可验证账本。
+- 本地 Web 控制台；已完成 deterministic prototype
+- 最小 Agent Runtime；已完成 deterministic prototype
+- 文件读取和文件修改；已完成 prototype
+- 文件修改前快照；已完成 prototype
+- 操作时间线；已完成 prototype
+- 本地审计日志；已完成 prototype
+- 本地日志哈希；已完成 prototype
+- 高风险操作确认；已完成 prototype
+- 审计报告；已完成 prototype
+- 本地可验证账本；已完成 prototype
 
 ### V0.2 MVP
 
