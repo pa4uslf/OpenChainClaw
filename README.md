@@ -3,7 +3,6 @@
 > A transparent, local-first, Web3-verifiable personal AI assistant.
 
 [![Status](https://img.shields.io/badge/status-planning-blue)](#roadmap)
-[![PRD](https://img.shields.io/badge/PRD-v1.0-2ea44f)](docs/PRD.md)
 [![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
 [![Local First](https://img.shields.io/badge/local--first-by%20default-6f42c1)](#privacy-and-safety)
 
@@ -103,7 +102,6 @@ OpenChainClaw 不是单纯更强的 AI 助手，而是一个让个人 AI 助手�
 
 ## Documentation
 
-- [Product Requirements Document v1.0](docs/PRD.md)
 - [License](LICENSE)
 
 ## Roadmap
@@ -164,7 +162,7 @@ OpenChainClaw 第一版明确不做：
 
 当前仓库处于 **PRD and architecture planning** 阶段。下一步重点是：
 
-1. 基于 PRD 制定技术方案；
+1. 基于本地产品需求制定技术方案；
 2. 确定本地日志、哈希和链上记录的数据结构；
 3. 设计本地 Web 控制台核心页面；
 4. 制定 V0.1 原型开发范围；

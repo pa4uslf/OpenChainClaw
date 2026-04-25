@@ -48,3 +48,6 @@ __pycache__/
 data/
 snapshots/
 audit-logs/
+
+# Local-only product documents
+docs/PRD.md
