@@ -1,0 +1,12 @@
+flowchart LR
+    User[User] --> Console[Local Web Console]
+    Console --> Runtime[Local Agent Runtime]
+    Runtime --> Files[File Tools]
+    Runtime --> Web[Web Browser]
+    Runtime --> API[API Calls]
+    Runtime --> Audit[Local Audit Log]
+    Audit --> Hash[Log Hash]
+    Hash --> Chain[On-chain Proof / Submit Queue]
+    Runtime --> Guard[Risk Guard]
+    Guard --> Confirm[User Approval]
+    Runtime --> Snapshot[File Snapshot & Rollback]

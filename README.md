@@ -30,20 +30,9 @@ OpenChainClaw 第一版采用：
 
 **Local Web Console + Local Agent Runtime**
 
-```mermaid
-flowchart LR
-    User[User] --> Console[Local Web Console]
-    Console --> Runtime[Local Agent Runtime]
-    Runtime --> Files[File Tools]
-    Runtime --> Web[Web Browser]
-    Runtime --> API[API Calls]
-    Runtime --> Audit[Local Audit Log]
-    Audit --> Hash[Log Hash]
-    Hash --> Chain[On-chain Proof / Submit Queue]
-    Runtime --> Guard[Risk Guard]
-    Guard --> Confirm[User Approval]
-    Runtime --> Snapshot[File Snapshot & Rollback]
-```
+![OpenChainClaw MVP architecture](docs/assets/architecture.png)
+
+The diagram source is available as [Mermaid](docs/architecture.mmd) and [SVG](docs/assets/architecture.svg).
 
 ## Highlights
 

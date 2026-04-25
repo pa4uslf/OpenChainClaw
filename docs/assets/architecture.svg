@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="640" viewBox="0 0 1120 640" role="img" aria-labelledby="title desc">
+  <title id="title">OpenChainClaw MVP architecture</title>
+  <desc id="desc">A local web console sends tasks to a local agent runtime. The runtime calls file tools, web browser, API calls, local audit log, risk guard, and file snapshot rollback. Audit logs become hashes and on-chain proof records.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+    <style>
+      .bg { fill: #f8fafc; }
+      .title { font: 700 28px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .subtitle { font: 500 15px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 16; filter: url(#shadow); }
+      .box-core { fill: #eef6ff; stroke: #2563eb; stroke-width: 2.5; rx: 18; filter: url(#shadow); }
+      .box-risk { fill: #fff7ed; stroke: #f97316; stroke-width: 2; rx: 16; filter: url(#shadow); }
+      .box-proof { fill: #f0fdf4; stroke: #16a34a; stroke-width: 2; rx: 16; filter: url(#shadow); }
+      .label { font: 700 17px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; }
+      .small { font: 500 13px ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #64748b; }
+      .line { stroke: #475569; stroke-width: 2.3; fill: none; marker-end: url(#arrow); }
+      .muted-line { stroke: #94a3b8; stroke-width: 2; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect class="bg" width="1120" height="640"/>
+
+  <text class="title" x="48" y="58">OpenChainClaw MVP Architecture</text>
+  <text class="subtitle" x="48" y="84">Local-first AI assistant with audit logs, risk controls, rollback, and verifiable proofs.</text>
+
+  <rect class="box" x="54" y="285" width="142" height="86"/>
+  <text class="label" x="125" y="321" text-anchor="middle">User</text>
+  <text class="small" x="125" y="345" text-anchor="middle">Task input</text>
+
+  <rect class="box" x="266" y="277" width="178" height="102"/>
+  <text class="label" x="355" y="317" text-anchor="middle">Local Web</text>
+  <text class="label" x="355" y="339" text-anchor="middle">Console</text>
+  <text class="small" x="355" y="363" text-anchor="middle">Timeline + approvals</text>
+
+  <rect class="box-core" x="518" y="267" width="198" height="122"/>
+  <text class="label" x="617" y="311" text-anchor="middle">Local Agent</text>
+  <text class="label" x="617" y="335" text-anchor="middle">Runtime</text>
+  <text class="small" x="617" y="361" text-anchor="middle">Tool execution layer</text>
+
+  <rect class="box" x="812" y="230" width="176" height="74"/>
+  <text class="label" x="900" y="263" text-anchor="middle">File Tools</text>
+  <text class="small" x="900" y="286" text-anchor="middle">Read / write</text>
+
+  <rect class="box" x="812" y="336" width="176" height="74"/>
+  <text class="label" x="900" y="369" text-anchor="middle">Web Browser</text>
+  <text class="small" x="900" y="392" text-anchor="middle">Whitelisted access</text>
+
+  <rect class="box" x="812" y="442" width="176" height="74"/>
+  <text class="label" x="900" y="475" text-anchor="middle">API Calls</text>
+  <text class="small" x="900" y="498" text-anchor="middle">Metadata logged</text>
+
+  <rect class="box-risk" x="518" y="470" width="198" height="86"/>
+  <text class="label" x="617" y="506" text-anchor="middle">Risk Guard</text>
+  <text class="small" x="617" y="530" text-anchor="middle">High-risk approval</text>
+
+  <rect class="box-risk" x="266" y="476" width="178" height="74"/>
+  <text class="label" x="355" y="509" text-anchor="middle">User Approval</text>
+  <text class="small" x="355" y="532" text-anchor="middle">Allow / deny</text>
+
+  <rect class="box-proof" x="266" y="120" width="178" height="84"/>
+  <text class="label" x="355" y="156" text-anchor="middle">On-chain Proof</text>
+  <text class="small" x="355" y="180" text-anchor="middle">Hash / index only</text>
+
+  <rect class="box-proof" x="518" y="128" width="198" height="84"/>
+  <text class="label" x="617" y="164" text-anchor="middle">Log Hash</text>
+  <text class="small" x="617" y="188" text-anchor="middle">Verifiable digest</text>
+
+  <rect class="box-proof" x="812" y="120" width="176" height="74"/>
+  <text class="label" x="900" y="153" text-anchor="middle">Local Audit Log</text>
+  <text class="small" x="900" y="176" text-anchor="middle">Full local source</text>
+
+  <rect class="box" x="812" y="548" width="176" height="74"/>
+  <text class="label" x="900" y="581" text-anchor="middle">Snapshot</text>
+  <text class="small" x="900" y="604" text-anchor="middle">Diff + rollback</text>
+
+  <path class="line" d="M 196 328 L 266 328"/>
+  <path class="line" d="M 444 328 L 518 328"/>
+  <path class="line" d="M 716 314 C 752 292, 768 270, 812 267"/>
+  <path class="line" d="M 716 328 L 812 373"/>
+  <path class="line" d="M 716 342 C 752 388, 768 463, 812 479"/>
+  <path class="line" d="M 617 389 L 617 470"/>
+  <path class="line" d="M 518 513 L 444 513"/>
+  <path class="muted-line" d="M 617 267 L 617 212"/>
+  <path class="muted-line" d="M 518 170 L 444 162"/>
+  <path class="muted-line" d="M 812 157 C 758 157, 736 165, 716 170"/>
+  <path class="muted-line" d="M 716 358 C 760 450, 770 568, 812 585"/>
+</svg>
