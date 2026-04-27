@@ -90,7 +90,7 @@ This walkthrough validates transparent audit trails, risk blocking, snapshots, r
 | Phase | Status | Public Goal |
 | --- | --- | --- |
 | `V0.1` Local Prototype | Done | Validate task timelines, risk blocking, file snapshots, rollback, and local ledger proofs. |
-| `V0.2` Minimum Runtime Core | Next | Add a real minimal assistant loop, authorized directories, site allowlists, preferences, web adapters, and API adapters. |
+| `V0.2` Minimum Runtime Core | Next | Add a real minimal assistant loop, guided local setup, authorized directories, site allowlists, preferences, web adapters, and API adapters. |
 | `V0.3` Verifiable Proof Loop | Planned | Add the proof queue, optional wallet connection, signature summaries, and local record comparison. |
 | `V0.4` Early Trial Release | Planned | Improve task history, audit search, report export, early trial flow, and mobile control experiments through trusted messaging channels. |
 | `V1.0` Minimum Viable Product | Target | Let personal users complete file, web, API, and mobile-initiated tasks while verifying the critical action trail. |
@@ -100,6 +100,7 @@ This walkthrough validates transparent audit trails, risk blocking, snapshots, r
 OpenChainClaw starts with a local console and a small trusted runtime. As the audit model matures, future versions may expand into:
 
 - mobile control through messaging channels such as Telegram, Signal, Discord, Slack, or other user-approved IM surfaces;
+- guided setup for safer first-run configuration;
 - additional tool connectors for developer workflows and personal knowledge bases;
 - richer proof backends and verification explorers;
 - optional companion apps when the local console experience is stable.
