@@ -61,6 +61,29 @@ http://127.0.0.1:4173
 
 本地审计数据会写入 `.openchainclaw/`，演示工作区会写入 `data/workspace/`。这两个目录都不会进入版本库。
 
+### 原型演示流程
+
+运行本地控制台后，可以用默认任务体验当前原型：
+
+1. 创建一个演示任务；
+2. 查看任务时间线中的文件读取、文件修改、风险判断和证明事件；
+3. 在非白名单网页访问前批准或拒绝高风险操作；
+4. 查看文件修改差异；
+5. 执行文件回滚；
+6. 查看任务完成后的本地审计哈希和本地账本记录。
+
+这个流程用于验证透明审计、风险拦截、快照、回滚和本地证明，不代表已经接入真实模型、真实网页自动化或公链提交。
+
+### 安全默认值
+
+- 原始审计日志默认只保存在本机。
+- 隐藏文件和疑似敏感文件默认禁止读取。
+- 非白名单网页访问会先进入高风险确认。
+- 文件修改前必须创建快照。
+- 回滚操作本身也会进入审计记录。
+- 可验证记录只保存哈希、索引、时间戳和风险摘要。
+- 原始文件内容、接口请求正文、令牌、私钥和浏览器身份凭据不上链。
+
 ### 项目路线图
 
 | 阶段 | 状态 | 公开目标 |
@@ -155,6 +178,29 @@ http://127.0.0.1:4173
 ```
 
 Local audit data is written to `.openchainclaw/`. The demo workspace is written to `data/workspace/`. Both directories are ignored by git.
+
+### Prototype Walkthrough
+
+After starting the local console, use the default task to try the current prototype:
+
+1. create a demo task;
+2. inspect file read, file modify, risk review, and proof events in the task timeline;
+3. approve or reject a high-risk non-allowlisted web visit;
+4. inspect the file diff;
+5. roll back the file change;
+6. review the local audit hash and local ledger record after completion.
+
+This walkthrough validates transparent audit trails, risk blocking, snapshots, rollback, and local proofs. It does not mean real model calls, real browser automation, or public-chain submission are already integrated.
+
+### Security Defaults
+
+- Raw audit logs stay on the local machine by default.
+- Hidden files and likely sensitive files are blocked by default.
+- Non-allowlisted web visits pause for high-risk approval.
+- File modification must create a snapshot first.
+- Rollback actions are also recorded in the audit trail.
+- Verifiable records store only hashes, indexes, timestamps, and risk summaries.
+- Raw file content, API request bodies, tokens, private keys, and browser credentials are not written on-chain.
 
 ### Project Roadmap
 
