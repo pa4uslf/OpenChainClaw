@@ -53,3 +53,5 @@ audit-logs/
 docs/PRD.md
 docs/ROADMAP*.md
 docs/TODO*.md
+docs/TECH_STACK_DECISION.md
+docs/MIGRATION_CHECKLIST.md
