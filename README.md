@@ -1,131 +1,147 @@
 # OpenChainClaw
 
-> A transparent, local-first, Web3-verifiable personal AI assistant.
+## 中文
 
-[![Status](https://img.shields.io/badge/status-V0.1%20prototype-blue)](#project-status)
-[![License: MIT](https://img.shields.io/badge/license-MIT-yellow.svg)](LICENSE)
-[![Local First](https://img.shields.io/badge/local--first-by%20default-6f42c1)](#privacy-and-safety)
+OpenChainClaw 是一个本地优先、可验证、可回溯的个人智能助手原型。项目重点不是先追求更强的自动执行能力，而是验证一个更基础的问题：用户是否愿意因为操作过程透明、风险可拦截、记录可验证而选择使用这个助手。
 
-OpenChainClaw 是一个融合 Web3 可验证记录能力的透明个人 AI 助手项目。它不把第一版目标放在“更强的 agent 能力”上，而是优先验证一个更关键的问题：
+### 项目定位
 
-**用户是否愿意因为 AI 操作过程透明、可验证、可回溯，而选择使用 OpenChainClaw。**
+- 本地网页控制台用于创建任务、查看时间线、处理风险确认和阅读审计报告。
+- 本地运行时负责文件读写、网页访问、接口调用、风险判断、快照、回滚和本地证明记录。
+- 原始日志默认只保存在本地。
+- 可验证记录只保存哈希、索引、时间戳和风险摘要，不保存原始隐私数据。
+- 钱包能力是可选增强，不是使用门槛。
 
-## Why OpenChainClaw
+### 当前状态
 
-现有个人 AI 助手和 agent 项目已经能完成越来越多任务，但它们的实际运行过程往往不够透明。用户很难独立确认：
+当前仓库处于 `V0.1` 本地原型阶段，已经具备无依赖本地控制台和确定性演示运行时。
 
-- AI 读取了哪些文件；
-- AI 修改了哪些内容；
-- AI 访问了哪些网站；
-- AI 调用了哪些 API；
-- 是否有隐私数据被发送给第三方；
-- 操作记录是否完整、可验证、可回溯。
+已完成能力包括：
 
-OpenChainClaw 的核心方向是：**让 AI 助手的关键操作可见、可验证、可拦截、可恢复。**
+- 从本地控制台创建任务；
+- 记录文件读取、文件修改、风险判断、用户确认、网页访问、接口调用和本地证明事件；
+- 默认阻止隐藏文件和敏感文件读取；
+- 非白名单网页访问前进入高风险确认；
+- 文件修改前创建快照；
+- 展示文件差异并支持回滚；
+- 生成确定性本地审计哈希；
+- 写入本地可验证账本记录。
 
-## Core Idea
+尚未完成能力包括：
 
-OpenChainClaw 第一版采用：
+- 真实模型规划和执行循环；
+- 真实网页自动化和网页内容提取；
+- 真实外部接口调用；
+- 钱包连接和钱包签名确认；
+- 公链提交。
 
-**Local Web Console + Local Agent Runtime**
+### 架构
 
-![OpenChainClaw MVP architecture](docs/assets/architecture.png)
+![OpenChainClaw 架构图](docs/assets/architecture.png)
 
-The diagram source is available as [Mermaid](docs/architecture.mmd) and [SVG](docs/assets/architecture.svg).
+架构图源文件：
 
-## Highlights
+- [Mermaid](docs/architecture.mmd)
+- [SVG](docs/assets/architecture.svg)
 
-- **Transparent timeline**: 展示任务执行过程、工具调用、文件读写、网页访问和 API 调用。
-- **Local audit log**: 原始操作日志默认保存在本地，作为完整审计源。
-- **Web3-verifiable proof**: 链上只保存哈希、索引、时间戳和证明字段，不保存原始隐私数据。
-- **Risk guard**: 高风险操作执行前暂停，等待用户确认。
-- **Rollback-first file edits**: 文件修改前创建快照，支持 diff 和回滚。
-- **Optional wallet flow**: 钱包连接可选，可用于身份绑定和高风险操作签名确认。
+### 快速开始
 
-## MVP Scope
+运行要求：`Node.js 20` 或更新版本。
 
-MVP 优先实现透明审计层，不追平 OpenClaw、Hermes、Mercury 的全部 agent 能力。
+```bash
+npm test
+npm start
+```
 
-第一版必须包含：
+启动后访问：
 
-- 本地 Web 控制台；
-- 最小 Agent Runtime；
-- 本地文件读写；
-- 网页浏览；
-- API 调用；
-- 操作时间线；
-- 本地审计日志；
-- 本地日志哈希；
-- 链上记录或提交队列；
-- 高风险操作确认；
-- Blocked 操作禁止；
-- 文件修改快照与回滚；
-- 审计报告。
+```text
+http://127.0.0.1:4173
+```
 
-## Privacy and Safety
+本地审计数据会写入 `.openchainclaw/`，演示工作区会写入 `data/workspace/`。这两个目录都不会进入版本库。
 
-OpenChainClaw 第一版遵循：
+### 项目路线图
 
-**默认本地、最小外发、可验证记录。**
-
-| Area | MVP Rule |
-| --- | --- |
-| Raw file content | 不默认上传，不上链 |
-| User prompt | 本地保存，原文不上链 |
-| API request body | 本地脱敏记录，原文不上链 |
-| Private keys / tokens / cookies | 默认禁止读取，不上链 |
-| Hidden files | 默认 `Blocked` |
-| Paid API calls | 执行前必须确认 |
-| Sensitive data transfer | 执行前必须确认 |
-| File modification | 修改前快照，支持回滚 |
-
-## Risk Levels
-
-| Level | Meaning | Behavior |
+| 阶段 | 状态 | 公开目标 |
 | --- | --- | --- |
-| `Low` | 读取授权目录普通文件、访问用户确认过的白名单网站 | 自动执行并记录 |
-| `Medium` | 修改文件、调用普通 API | 执行并完整记录 |
-| `High` | 读取私密目录、上传文件、调用付费服务、外发疑似敏感数据、删除文件 | 暂停并请求用户确认 |
-| `Blocked` | 读取私钥、上传 token、读取或上传隐藏文件、删除大量文件、未经确认发送隐私数据 | 默认禁止 |
+| `V0.1` 本地原型 | 已完成 | 验证任务时间线、风险拦截、文件快照、回滚和本地账本证明。 |
+| `V0.2` 最小可用内核 | 下一阶段 | 接入真实最小智能助手循环、授权目录、网站白名单、偏好管理、网页访问和接口调用适配器。 |
+| `V0.3` 可验证证明闭环 | 计划中 | 完成证明队列、可选钱包连接、签名摘要和本地记录对比。 |
+| `V0.4` 早期试用版本 | 计划中 | 打磨任务历史、审计检索、报告导出和早期试用流程。 |
+| `V1.0` 最小可用产品 | 目标版本 | 让个人用户完成文件、网页和接口任务，并能验证关键操作过程。 |
 
-## Differentiation
+### 最小版本边界
 
-OpenChainClaw 不是单纯更强的 AI 助手，而是一个让个人 AI 助手操作过程透明、可验证、可回溯的 Web3-native AI assistant。
+第一版明确不做：
 
-相较传统黑箱式 agent，OpenChainClaw 更关注：
+- 企业权限系统；
+- 团队审批；
+- 去中心化治理；
+- 完整多智能体投票；
+- 复杂长期知识图谱；
+- 复杂跨设备同步；
+- 浏览器插件；
+- 桌面端客户端；
+- 移动端应用；
+- 企业合规审计报表；
+- 浏览器身份凭据读取；
+- 钱包私钥读取；
+- 原始隐私数据上链。
 
-- 用户能看到 AI 做了什么；
-- 高风险操作不会悄悄发生；
-- 本地日志可以和链上证明对照；
-- 文件修改可以回滚；
-- 链上记录用于证明，而不是泄露数据。
+### 许可证
 
-## Current Prototype
+[MIT](LICENSE)
 
-V0.1 prototype now includes a no-dependency local console and local runtime:
+---
 
-- create a task from the local Web console;
-- record a task timeline with file read, file modify, risk review, approval, simulated web visit, simulated API call and proof events;
-- block hidden or sensitive file reads by default;
-- pause high-risk non-whitelisted web access until user approval;
-- create a snapshot before text file modification;
-- show file diff and support rollback;
-- generate a deterministic local audit hash;
-- write a local verifiable ledger record that stands in for the MVP chain submission queue.
+## English
 
-The current runtime is deliberately deterministic. It demonstrates the audit, risk, rollback and proof flow before real model orchestration, real browser automation, wallet signing or public-chain submission are added.
+OpenChainClaw is a local-first, verifiable, and recoverable personal AI assistant prototype. The project does not start by chasing stronger autonomous execution. It first tests whether users will choose an assistant because its actions are transparent, interruptible, and independently verifiable.
 
-Current prototype limitations:
+### Product Positioning
 
-- no real LLM planning or model calls yet;
-- no real browser automation or live webpage extraction yet;
-- no real external API execution yet;
-- no wallet connection or wallet signature flow yet;
-- no public-chain submission yet.
+- The local web console creates tasks, shows timelines, handles risk approvals, and displays audit reports.
+- The local runtime handles file operations, web visits, API calls, risk checks, snapshots, rollback, and local proof records.
+- Raw audit logs stay local by default.
+- Verifiable records store only hashes, indexes, timestamps, and risk summaries, not private raw data.
+- Wallet support is optional. It is not required for core local use.
 
-## Quickstart
+### Current Status
 
-Prerequisite: Node.js 20 or newer.
+The repository is at the `V0.1` local prototype stage. It already includes a no-dependency local console and a deterministic demo runtime.
+
+Completed capabilities:
+
+- create a task from the local console;
+- record file read, file modify, risk review, user approval, web visit, API call, and local proof events;
+- block hidden and sensitive file reads by default;
+- pause non-whitelisted web visits for high-risk approval;
+- create a snapshot before file modification;
+- show file diffs and support rollback;
+- generate deterministic local audit hashes;
+- write local verifiable ledger records.
+
+Missing capabilities:
+
+- real model planning and execution loop;
+- real browser automation and webpage extraction;
+- real external API execution;
+- wallet connection and wallet signature approval;
+- public-chain submission.
+
+### Architecture
+
+![OpenChainClaw architecture](docs/assets/architecture.png)
+
+Architecture sources:
+
+- [Mermaid](docs/architecture.mmd)
+- [SVG](docs/assets/architecture.svg)
+
+### Quickstart
+
+Requirement: `Node.js 20` or newer.
 
 ```bash
 npm test
@@ -138,73 +154,36 @@ Then open:
 http://127.0.0.1:4173
 ```
 
-Local audit data is written under `.openchainclaw/`; the demo editable workspace is written under `data/workspace/`. Both paths are ignored by git.
+Local audit data is written to `.openchainclaw/`. The demo workspace is written to `data/workspace/`. Both directories are ignored by git.
 
-## Documentation
+### Project Roadmap
 
-- [License](LICENSE)
+| Phase | Status | Public Goal |
+| --- | --- | --- |
+| `V0.1` Local Prototype | Done | Validate task timelines, risk blocking, file snapshots, rollback, and local ledger proofs. |
+| `V0.2` Minimum Runtime Core | Next | Add a real minimal assistant loop, authorized directories, site allowlists, preferences, web adapters, and API adapters. |
+| `V0.3` Verifiable Proof Loop | Planned | Add the proof queue, optional wallet connection, signature summaries, and local record comparison. |
+| `V0.4` Early Trial Release | Planned | Improve task history, audit search, report export, and early trial flow. |
+| `V1.0` Minimum Viable Product | Target | Let personal users complete file, web, and API tasks while verifying the critical action trail. |
 
-## Roadmap
+### Minimum Version Boundaries
 
-### V0.1 Prototype
+The first version explicitly excludes:
 
-- 本地 Web 控制台；已完成 deterministic prototype
-- 最小 Agent Runtime；已完成 deterministic prototype
-- 文件读取和文件修改；已完成 prototype
-- 文件修改前快照；已完成 prototype
-- 操作时间线；已完成 prototype
-- 本地审计日志；已完成 prototype
-- 本地日志哈希；已完成 prototype
-- 高风险操作确认；已完成 prototype
-- 审计报告；已完成 prototype
-- 本地可验证账本；已完成 prototype
+- enterprise permission systems;
+- team approval workflows;
+- decentralized governance;
+- full multi-agent voting;
+- complex long-term knowledge graphs;
+- complex cross-device sync;
+- browser extensions;
+- desktop clients;
+- mobile apps;
+- enterprise compliance reports;
+- browser Cookie reading;
+- wallet private-key reading;
+- raw private data on-chain.
 
-### V0.2 MVP
+### License
 
-- 网页浏览；
-- API 调用；
-- 链上记录或链上提交队列；
-- 钱包可选连接；
-- 钱包签名确认；
-- 白名单管理；
-- 审计日志检索；
-- 文件 diff 和回滚；
-- 任务历史；
-- 用户偏好；
-- Markdown / JSON 审计报告导出。
-
-### Later
-
-- GitHub、邮箱、日历、知识库等更多工具；
-- 外部 agent 审计 SDK；
-- 插件注册机制；
-- 更多链或可验证存储方案；
-- 多 agent 安全评审；
-- 更完整的开发者文档和社区贡献机制。
-
-## Non-goals for MVP
-
-OpenChainClaw 第一版明确不做：
-
-- 企业权限系统；
-- DAO 治理；
-- 完整多 agent 投票；
-- 复杂长期知识图谱；
-- 复杂跨设备同步；
-- 浏览器 cookie 读取；
-- 钱包私钥读取；
-- 原始隐私数据上链；
-- 完整桌面端；
-- 移动端 App；
-- 企业合规审计报表。
-
-## Project Status
-
-当前仓库处于 **V0.1 local prototype** 阶段。下一步重点是：
-
-1. 将 demo runtime 替换为真实最小 agent planning/execution loop；
-2. 补授权目录、网站白名单和偏好管理的写入界面；
-3. 增加真实网页抓取与 API 调用适配器；
-4. 将本地可验证账本扩展为链上提交队列；
-5. 增加钱包连接和高风险操作签名摘要；
-6. 准备早期用户试用脚本和反馈问卷。
+[MIT](LICENSE)

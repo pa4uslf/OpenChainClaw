@@ -51,3 +51,5 @@ audit-logs/
 
 # Local-only product documents
 docs/PRD.md
+docs/ROADMAP*.md
+docs/TODO*.md
