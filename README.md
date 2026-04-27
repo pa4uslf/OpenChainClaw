@@ -27,13 +27,14 @@ Completed capabilities:
 - generate deterministic local audit hashes;
 - write local verifiable ledger records.
 
-Missing capabilities:
+Next areas under exploration:
 
 - real model planning and execution loop;
 - real browser automation and webpage extraction;
 - real external API execution;
-- wallet connection and wallet signature approval;
-- public-chain submission.
+- mobile control surfaces through trusted messaging channels;
+- optional wallet connection and signature approval;
+- verifiable proof submission.
 
 ## Architecture
 
@@ -91,26 +92,19 @@ This walkthrough validates transparent audit trails, risk blocking, snapshots, r
 | `V0.1` Local Prototype | Done | Validate task timelines, risk blocking, file snapshots, rollback, and local ledger proofs. |
 | `V0.2` Minimum Runtime Core | Next | Add a real minimal assistant loop, authorized directories, site allowlists, preferences, web adapters, and API adapters. |
 | `V0.3` Verifiable Proof Loop | Planned | Add the proof queue, optional wallet connection, signature summaries, and local record comparison. |
-| `V0.4` Early Trial Release | Planned | Improve task history, audit search, report export, and early trial flow. |
-| `V1.0` Minimum Viable Product | Target | Let personal users complete file, web, and API tasks while verifying the critical action trail. |
+| `V0.4` Early Trial Release | Planned | Improve task history, audit search, report export, early trial flow, and mobile control experiments through trusted messaging channels. |
+| `V1.0` Minimum Viable Product | Target | Let personal users complete file, web, API, and mobile-initiated tasks while verifying the critical action trail. |
 
-## Minimum Version Boundaries
+## Future Expansion
 
-The first version explicitly excludes:
+OpenChainClaw starts with a local console and a small trusted runtime. As the audit model matures, future versions may expand into:
 
-- enterprise permission systems;
-- team approval workflows;
-- decentralized governance;
-- full multi-agent voting;
-- complex long-term knowledge graphs;
-- complex cross-device sync;
-- browser extensions;
-- desktop clients;
-- mobile apps;
-- enterprise compliance reports;
-- browser Cookie reading;
-- wallet private-key reading;
-- raw private data on-chain.
+- mobile control through messaging channels such as Telegram, Signal, Discord, Slack, or other user-approved IM surfaces;
+- additional tool connectors for developer workflows and personal knowledge bases;
+- richer proof backends and verification explorers;
+- optional companion apps when the local console experience is stable.
+
+These extensions should preserve the same safety defaults: local-first logs, explicit approval for high-risk actions, recoverable file changes, and no raw private data on-chain.
 
 ## License
 
