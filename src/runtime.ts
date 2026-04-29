@@ -1,29 +1,197 @@
-const fs = require("node:fs/promises");
-const path = require("node:path");
-const { lineDiff } = require("./diff");
-const { sha256 } = require("./hash");
-const {
+import fs from "node:fs/promises";
+import path from "node:path";
+import { lineDiff } from "./diff.js";
+import { sha256 } from "./hash.js";
+import {
   assessApiCall,
   assessFileModify,
   assessFileRead,
   assessWebVisit,
-  normalizeUrlHost
-} = require("./risk");
-const { ensureDir, pathExists, readJson, writeJson } = require("./storage");
+  normalizeUrlHost,
+  type RiskAssessment,
+  type RiskLevel
+} from "./risk.js";
+import { ensureDir, pathExists, readJson, writeJson } from "./storage.js";
 
 const DEFAULT_AGENT_ID = "openchainclaw-local-runtime";
 
-function createId(prefix) {
+export type ExecutionStatus = "executed" | "blocked" | "waiting_confirmation" | "failed";
+export type TaskStatus = "pending" | "running" | "waiting_confirmation" | "completed" | "failed" | "cancelled";
+export type UserApprovalStatus = "not_required" | "pending" | "approved" | "rejected" | "blocked";
+export type ChainRecordStatus = "not_submitted" | "local_ledger";
+
+export interface RuntimeOptions {
+  dataDir?: string;
+  workspaceDir?: string;
+  allowedDirectories?: string[];
+  webWhitelist?: string[];
+  agentId?: string;
+}
+
+export interface ApiCall {
+  serviceName?: string;
+  method?: string;
+  url: string;
+  purpose?: string;
+  paid?: boolean;
+  sensitiveTransfer?: boolean;
+  headers?: Record<string, string>;
+  body?: Record<string, unknown>;
+}
+
+export interface TimelineEvent {
+  operation_id: string;
+  task_id: string;
+  timestamp: string;
+  agent_id: string;
+  operation_type: string;
+  operation_target: string;
+  tool_name: string;
+  purpose_summary: string;
+  risk_level: RiskLevel;
+  execution_status: ExecutionStatus;
+  user_approval_status: UserApprovalStatus;
+  before_hash: string | null;
+  after_hash: string | null;
+  local_log_hash: string | null;
+  chain_record_status: ChainRecordStatus;
+  risk_reason?: string;
+  expected_impact?: string;
+  snapshot_path?: string;
+  diff?: string;
+  restored_from_operation_id?: string;
+  page_title?: string;
+  api_service_name?: string;
+  http_method?: string;
+  redacted_request_metadata?: {
+    headers: string[];
+    body_shape: string[];
+  };
+  paid?: boolean;
+  sensitive_transfer?: boolean;
+}
+
+type TimelineEventInput = Omit<
+  TimelineEvent,
+  "operation_id" | "task_id" | "timestamp" | "agent_id" | "user_approval_status" | "before_hash" | "after_hash" | "local_log_hash" | "chain_record_status"
+> &
+  Partial<Pick<TimelineEvent, "operation_id" | "user_approval_status" | "before_hash" | "after_hash" | "local_log_hash" | "chain_record_status">>;
+
+type PendingKind = "file_read" | "file_modify" | "web_visit" | "api_call";
+
+interface PendingPayload {
+  purpose?: string;
+  nextContent?: string;
+  serviceName?: string;
+  method?: string;
+  url?: string;
+  paid?: boolean;
+  sensitiveTransfer?: boolean;
+  headers?: Record<string, string>;
+  body?: Record<string, unknown>;
+}
+
+interface PendingOperationInput {
+  kind: PendingKind;
+  target: string;
+  payload: PendingPayload;
+  assessment: RiskAssessment;
+  event: Omit<TimelineEventInput, "execution_status">;
+}
+
+export interface PendingOperation extends PendingOperationInput {
+  pending_id: string;
+  created_at: string;
+}
+
+export interface RiskSummary {
+  Low: number;
+  Medium: number;
+  High: number;
+  Blocked: number;
+}
+
+export interface LedgerRecord {
+  record_version: number;
+  task_id: string;
+  operation_batch_hash: string;
+  local_log_hash: string;
+  timestamp: string;
+  agent_id: string;
+  risk_level_summary: RiskSummary;
+  user_approval_hash: string;
+  previous_record_hash: string | null;
+  submission_status: "local_ledger";
+  record_hash: string;
+}
+
+export interface AuditReport {
+  task_id: string;
+  task_summary: string;
+  started_at: string | null;
+  completed_at: string | null;
+  operation_count: number;
+  file_reads: number;
+  file_modifications: number;
+  web_visits: number;
+  api_calls: number;
+  risk_level_summary: RiskSummary;
+  high_risk_operations: TimelineEvent[];
+  approval_records: TimelineEvent[];
+  rollback_records: TimelineEvent[];
+  local_log_hash: string;
+  chain_record_status: "local_ledger";
+  chain_record: LedgerRecord;
+  verification: {
+    status: "matched" | "mismatched";
+    explanation: string;
+  };
+}
+
+export interface Task {
+  task_id: string;
+  agent_id: string;
+  prompt: string;
+  status: TaskStatus;
+  created_at: string;
+  updated_at: string;
+  started_at: string | null;
+  completed_at: string | null;
+  pending_operation: PendingOperation | null;
+  timeline: TimelineEvent[];
+  reports: AuditReport | null;
+  preferences_snapshot: {
+    allowed_directories: string[];
+    web_whitelist: string[];
+  };
+}
+
+function createId(prefix: string): string {
   const entropy = Math.random().toString(36).slice(2, 10);
   return `${prefix}_${Date.now().toString(36)}_${entropy}`;
 }
 
-function nowIso() {
+function nowIso(): string {
   return new Date().toISOString();
 }
 
-class OpenChainClawRuntime {
-  constructor(options = {}) {
+function statusError(message: string, statusCode: number): Error & { statusCode: number } {
+  const error = new Error(message) as Error & { statusCode: number };
+  error.statusCode = statusCode;
+  return error;
+}
+
+export class OpenChainClawRuntime {
+  readonly dataDir: string;
+  readonly tasksDir: string;
+  readonly snapshotsDir: string;
+  readonly workspaceDir: string;
+  readonly ledgerPath: string;
+  readonly allowedDirectories: string[];
+  readonly webWhitelist: string[];
+  readonly agentId: string;
+
+  constructor(options: RuntimeOptions = {}) {
     const dataDir = options.dataDir || path.resolve(process.cwd(), ".openchainclaw");
     this.dataDir = dataDir;
     this.tasksDir = path.join(dataDir, "tasks");
@@ -35,7 +203,7 @@ class OpenChainClawRuntime {
     this.agentId = options.agentId || DEFAULT_AGENT_ID;
   }
 
-  async init() {
+  async init(): Promise<void> {
     await ensureDir(this.tasksDir);
     await ensureDir(this.snapshotsDir);
     await ensureDir(this.workspaceDir);
@@ -50,45 +218,43 @@ class OpenChainClawRuntime {
     }
   }
 
-  taskPath(taskId) {
+  taskPath(taskId: string): string {
     return path.join(this.tasksDir, `${taskId}.json`);
   }
 
-  async loadTask(taskId) {
-    const task = await readJson(this.taskPath(taskId), null);
+  async loadTask(taskId: string): Promise<Task> {
+    const task = await readJson<Task | null>(this.taskPath(taskId), null);
     if (!task) {
-      const error = new Error(`Task not found: ${taskId}`);
-      error.statusCode = 404;
-      throw error;
+      throw statusError(`Task not found: ${taskId}`, 404);
     }
     return task;
   }
 
-  async saveTask(task) {
+  async saveTask(task: Task): Promise<Task> {
     await writeJson(this.taskPath(task.task_id), task);
     return task;
   }
 
-  async listTasks() {
+  async listTasks(): Promise<Task[]> {
     await ensureDir(this.tasksDir);
     const entries = await fs.readdir(this.tasksDir);
     const tasks = await Promise.all(
       entries
         .filter((entry) => entry.endsWith(".json"))
-        .map((entry) => readJson(path.join(this.tasksDir, entry), null))
+        .map((entry) => readJson<Task | null>(path.join(this.tasksDir, entry), null))
     );
 
     return tasks
-      .filter(Boolean)
+      .filter((task): task is Task => Boolean(task))
       .sort((a, b) => b.created_at.localeCompare(a.created_at));
   }
 
-  async readLedger() {
-    return readJson(this.ledgerPath, []);
+  async readLedger(): Promise<LedgerRecord[]> {
+    return readJson<LedgerRecord[]>(this.ledgerPath, []);
   }
 
-  async createTask({ prompt }) {
-    const task = {
+  async createTask({ prompt }: { prompt: string }): Promise<Task> {
+    const task: Task = {
       task_id: createId("task"),
       agent_id: this.agentId,
       prompt,
@@ -119,9 +285,9 @@ class OpenChainClawRuntime {
     return this.loadTask(task.task_id);
   }
 
-  async record(taskId, event) {
+  async record(taskId: string, event: TimelineEventInput): Promise<TimelineEvent> {
     const task = await this.loadTask(taskId);
-    const operation = {
+    const operation: TimelineEvent = {
       operation_id: createId("op"),
       task_id: taskId,
       timestamp: nowIso(),
@@ -140,8 +306,8 @@ class OpenChainClawRuntime {
     return operation;
   }
 
-  async startDemoTask(taskId) {
-    let task = await this.loadTask(taskId);
+  async startDemoTask(taskId: string): Promise<Task> {
+    const task = await this.loadTask(taskId);
     task.status = "running";
     task.started_at = task.started_at || nowIso();
     await this.saveTask(task);
@@ -172,7 +338,7 @@ class OpenChainClawRuntime {
     return this.completeAfterApproval(taskId);
   }
 
-  async performFileRead(taskId, targetPath, purpose) {
+  async performFileRead(taskId: string, targetPath: string, purpose: string): Promise<TimelineEvent> {
     const assessment = assessFileRead(targetPath, this.allowedDirectories);
 
     if (assessment.level === "Blocked") {
@@ -218,7 +384,7 @@ class OpenChainClawRuntime {
     });
   }
 
-  async performFileModify(taskId, targetPath, nextContent, purpose) {
+  async performFileModify(taskId: string, targetPath: string, nextContent: string, purpose: string): Promise<TimelineEvent> {
     const assessment = assessFileModify(targetPath, this.allowedDirectories);
 
     if (assessment.level === "Blocked") {
@@ -289,14 +455,12 @@ class OpenChainClawRuntime {
     });
   }
 
-  async rollbackFile(taskId, operationId) {
+  async rollbackFile(taskId: string, operationId: string): Promise<TimelineEvent> {
     const task = await this.loadTask(taskId);
     const operation = task.timeline.find((entry) => entry.operation_id === operationId);
 
     if (!operation || operation.operation_type !== "file_modify") {
-      const error = new Error("No file modification operation found for rollback");
-      error.statusCode = 400;
-      throw error;
+      throw statusError("No file modification operation found for rollback", 400);
     }
 
     if (!operation.snapshot_path || !(await pathExists(operation.snapshot_path))) {
@@ -309,17 +473,13 @@ class OpenChainClawRuntime {
         risk_reason: "快照不存在，阻止回滚",
         execution_status: "failed"
       });
-      const error = new Error("Snapshot is missing; rollback blocked");
-      error.statusCode = 409;
-      throw error;
+      throw statusError("Snapshot is missing; rollback blocked", 409);
     }
 
     const snapshotContent = await fs.readFile(operation.snapshot_path, "utf8");
     const snapshotHash = sha256(snapshotContent);
     if (snapshotHash !== operation.before_hash) {
-      const error = new Error("Snapshot hash mismatch; rollback blocked");
-      error.statusCode = 409;
-      throw error;
+      throw statusError("Snapshot hash mismatch; rollback blocked", 409);
     }
 
     const currentContent = await fs.readFile(operation.operation_target, "utf8");
@@ -347,7 +507,7 @@ class OpenChainClawRuntime {
     return rollbackOperation;
   }
 
-  async requestWebVisit(taskId, url, purpose) {
+  async requestWebVisit(taskId: string, url: string, purpose: string): Promise<boolean> {
     const assessment = assessWebVisit(url, this.webWhitelist);
 
     if (assessment.level === "High") {
@@ -381,7 +541,7 @@ class OpenChainClawRuntime {
     return false;
   }
 
-  async performApiCall(taskId, apiCall) {
+  async performApiCall(taskId: string, apiCall: ApiCall): Promise<TimelineEvent> {
     const assessment = assessApiCall(apiCall);
 
     if (assessment.level === "High") {
@@ -420,7 +580,7 @@ class OpenChainClawRuntime {
     });
   }
 
-  async createPendingOperation(taskId, pendingOperation) {
+  async createPendingOperation(taskId: string, pendingOperation: PendingOperationInput): Promise<TimelineEvent> {
     const task = await this.loadTask(taskId);
     task.status = "waiting_confirmation";
     task.pending_operation = {
@@ -439,12 +599,10 @@ class OpenChainClawRuntime {
     });
   }
 
-  async resolvePendingOperation(taskId, decision) {
+  async resolvePendingOperation(taskId: string, decision: "approved" | "rejected"): Promise<Task> {
     const task = await this.loadTask(taskId);
     if (!task.pending_operation) {
-      const error = new Error("Task has no pending operation");
-      error.statusCode = 400;
-      throw error;
+      throw statusError("Task has no pending operation", 400);
     }
 
     const pendingOperation = task.pending_operation;
@@ -474,7 +632,7 @@ class OpenChainClawRuntime {
         operation_type: "web_visit",
         operation_target: pendingOperation.target,
         tool_name: "web.visit",
-        purpose_summary: pendingOperation.payload.purpose,
+        purpose_summary: pendingOperation.payload.purpose || "执行已批准网页访问",
         risk_level: "High",
         risk_reason: pendingOperation.assessment.reason,
         execution_status: "executed",
@@ -484,30 +642,46 @@ class OpenChainClawRuntime {
     }
 
     if (pendingOperation.kind === "api_call") {
-      await this.performApiCall(taskId, {
-        ...pendingOperation.payload,
+      const apiCall: ApiCall = {
+        url: pendingOperation.payload.url || pendingOperation.target,
         paid: false,
         sensitiveTransfer: false
-      });
+      };
+      if (pendingOperation.payload.serviceName) {
+        apiCall.serviceName = pendingOperation.payload.serviceName;
+      }
+      if (pendingOperation.payload.method) {
+        apiCall.method = pendingOperation.payload.method;
+      }
+      if (pendingOperation.payload.purpose) {
+        apiCall.purpose = pendingOperation.payload.purpose;
+      }
+      if (pendingOperation.payload.headers) {
+        apiCall.headers = pendingOperation.payload.headers;
+      }
+      if (pendingOperation.payload.body) {
+        apiCall.body = pendingOperation.payload.body;
+      }
+      await this.performApiCall(taskId, apiCall);
     }
 
     if (pendingOperation.kind === "file_read") {
-      await this.performFileRead(taskId, pendingOperation.target, pendingOperation.payload.purpose);
+      await this.performFileRead(taskId, pendingOperation.target, pendingOperation.payload.purpose || "执行已批准文件读取");
     }
 
     if (pendingOperation.kind === "file_modify") {
       await this.performFileModify(
         taskId,
         pendingOperation.target,
-        pendingOperation.payload.nextContent,
-        pendingOperation.payload.purpose
+        pendingOperation.payload.nextContent || "",
+        pendingOperation.payload.purpose || "执行已批准文件修改"
       );
     }
 
     return this.completeAfterApproval(taskId);
   }
 
-  async completeAfterApproval(taskId) {
+  async completeAfterApproval(taskId: string): Promise<Task> {
     await this.performApiCall(taskId, {
       serviceName: "Demo API",
       method: "GET",
@@ -519,7 +693,7 @@ class OpenChainClawRuntime {
     return this.finalizeTask(taskId, "completed");
   }
 
-  async finalizeTask(taskId, status = "completed") {
+  async finalizeTask(taskId: string, status: "completed" | "cancelled" = "completed"): Promise<Task> {
     const task = await this.loadTask(taskId);
     task.status = status;
     task.completed_at = nowIso();
@@ -527,7 +701,7 @@ class OpenChainClawRuntime {
     const localLogHash = this.computeLocalLogHash(task.timeline);
     const ledger = await this.readLedger();
     const previous = ledger.at(-1);
-    const chainRecord = {
+    const chainRecordBase = {
       record_version: 1,
       task_id: taskId,
       operation_batch_hash: sha256(task.timeline.map((entry) => entry.operation_id)),
@@ -545,9 +719,12 @@ class OpenChainClawRuntime {
           }))
       ),
       previous_record_hash: previous ? previous.record_hash : null,
-      submission_status: "local_ledger"
+      submission_status: "local_ledger" as const
     };
-    chainRecord.record_hash = sha256(chainRecord);
+    const chainRecord: LedgerRecord = {
+      ...chainRecordBase,
+      record_hash: sha256(chainRecordBase)
+    };
     ledger.push(chainRecord);
 
     task.reports = this.buildReport(task, localLogHash, chainRecord);
@@ -564,7 +741,7 @@ class OpenChainClawRuntime {
     return task;
   }
 
-  computeLocalLogHash(timeline) {
+  computeLocalLogHash(timeline: TimelineEvent[]): string {
     return sha256(
       timeline.map((entry) => ({
         operation_id: entry.operation_id,
@@ -582,19 +759,19 @@ class OpenChainClawRuntime {
     );
   }
 
-  summarizeRisk(timeline) {
-    return timeline.reduce(
+  summarizeRisk(timeline: TimelineEvent[]): RiskSummary {
+    return timeline.reduce<RiskSummary>(
       (summary, entry) => {
-        summary[entry.risk_level] = (summary[entry.risk_level] || 0) + 1;
+        summary[entry.risk_level] += 1;
         return summary;
       },
       { Low: 0, Medium: 0, High: 0, Blocked: 0 }
     );
   }
 
-  buildReport(task, localLogHash, chainRecord) {
+  buildReport(task: Task, localLogHash: string, chainRecord: LedgerRecord): AuditReport {
     const timeline = task.timeline;
-    const byType = (type) => timeline.filter((entry) => entry.operation_type === type);
+    const byType = (type: string): TimelineEvent[] => timeline.filter((entry) => entry.operation_type === type);
 
     return {
       task_id: task.task_id,
@@ -620,7 +797,3 @@ class OpenChainClawRuntime {
     };
   }
 }
-
-module.exports = {
-  OpenChainClawRuntime
-};

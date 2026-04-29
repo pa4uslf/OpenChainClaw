@@ -1,11 +1,15 @@
-const assert = require("node:assert/strict");
-const fs = require("node:fs/promises");
-const os = require("node:os");
-const path = require("node:path");
-const test = require("node:test");
-const { OpenChainClawRuntime } = require("../src/runtime");
+import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
+import test from "node:test";
+import { OpenChainClawRuntime } from "../src/runtime.js";
 
-async function createRuntime() {
+async function createRuntime(): Promise<{
+  root: string;
+  workspace: string;
+  runtime: OpenChainClawRuntime;
+}> {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "openchainclaw-"));
   const workspace = path.join(root, "workspace");
   const runtime = new OpenChainClawRuntime({
@@ -44,8 +48,8 @@ test("high-risk web visit waits for approval before execution", async () => {
 
   assert.equal(isPending, true);
   assert.equal(waitingTask.status, "waiting_confirmation");
-  assert.equal(waitingTask.pending_operation.kind, "web_visit");
-  assert.equal(waitingTask.timeline.at(-1).execution_status, "waiting_confirmation");
+  assert.equal(waitingTask.pending_operation?.kind, "web_visit");
+  assert.equal(waitingTask.timeline.at(-1)?.execution_status, "waiting_confirmation");
 
   const completed = await runtime.resolvePendingOperation(task.task_id, "approved");
 
@@ -62,7 +66,7 @@ test("file modification creates snapshot, diff, and rollback restores original c
   const operation = await runtime.performFileModify(task.task_id, target, "alpha\nbeta\n", "追加一行文本");
 
   assert.equal(operation.risk_level, "Medium");
-  assert.match(operation.diff, /\+beta/);
+  assert.match(operation.diff || "", /\+beta/);
   assert.ok(operation.snapshot_path);
 
   await runtime.rollbackFile(task.task_id, operation.operation_id);
@@ -80,10 +84,10 @@ test("finalized task creates matching local log hash and local ledger record", a
   const record = ledger.find((entry) => entry.task_id === task.task_id);
 
   assert.equal(completed.status, "completed");
-  assert.ok(completed.reports.local_log_hash);
-  assert.equal(completed.reports.verification.status, "matched");
-  assert.equal(record.local_log_hash, completed.reports.local_log_hash);
-  assert.equal(record.submission_status, "local_ledger");
+  assert.ok(completed.reports?.local_log_hash);
+  assert.equal(completed.reports?.verification.status, "matched");
+  assert.equal(record?.local_log_hash, completed.reports?.local_log_hash);
+  assert.equal(record?.submission_status, "local_ledger");
 });
 
 test("rollback after completion refreshes report hash and appends a ledger proof", async () => {
@@ -93,14 +97,15 @@ test("rollback after completion refreshes report hash and appends a ledger proof
   const completed = await runtime.resolvePendingOperation(task.task_id, "approved");
   const fileModify = completed.timeline.find((entry) => entry.operation_type === "file_modify");
 
+  assert.ok(fileModify);
   await runtime.rollbackFile(task.task_id, fileModify.operation_id);
 
   const refreshed = await runtime.loadTask(task.task_id);
   const ledger = await runtime.readLedger();
   const taskRecords = ledger.filter((entry) => entry.task_id === task.task_id);
 
-  assert.equal(refreshed.reports.operation_count, refreshed.timeline.length);
-  assert.equal(refreshed.reports.rollback_records.length, 1);
+  assert.equal(refreshed.reports?.operation_count, refreshed.timeline.length);
+  assert.equal(refreshed.reports?.rollback_records.length, 1);
   assert.equal(taskRecords.length, 2);
-  assert.equal(taskRecords.at(-1).local_log_hash, refreshed.reports.local_log_hash);
+  assert.equal(taskRecords.at(-1)?.local_log_hash, refreshed.reports?.local_log_hash);
 });

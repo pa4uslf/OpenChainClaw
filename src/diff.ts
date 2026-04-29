@@ -1,4 +1,4 @@
-function lineDiff(beforeText, afterText) {
+export function lineDiff(beforeText: string, afterText: string): string {
   const beforeLines = beforeText.split("\n");
   const afterLines = afterText.split("\n");
   const maxLength = Math.max(beforeLines.length, afterLines.length);
@@ -26,7 +26,3 @@ function lineDiff(beforeText, afterText) {
 
   return lines.join("\n");
 }
-
-module.exports = {
-  lineDiff
-};

@@ -14,7 +14,7 @@ OpenChainClaw 是一个本地优先、可验证、可回溯的个人智能助手
 
 ## 当前状态
 
-当前仓库处于 `V0.1` 本地原型阶段，已经具备无依赖本地控制台和确定性演示运行时。
+当前仓库处于 `V0.1` 本地原型阶段，已经具备本地控制台、确定性演示运行时、TypeScript/ESM Node 运行时，以及可选的服务端 PostHog 事件采集。
 
 已完成能力包括：
 
@@ -47,11 +47,16 @@ OpenChainClaw 是一个本地优先、可验证、可回溯的个人智能助手
 
 ## 快速开始
 
-运行要求：`Node.js 20` 或更新版本。
+运行要求：
+
+- `Node.js 22.22.0` 或更新版本；
+- `pnpm 10.x`。
 
 ```bash
-npm test
-npm start
+pnpm install
+pnpm typecheck
+pnpm test
+pnpm start
 ```
 
 启动后访问：
@@ -61,6 +66,18 @@ http://127.0.0.1:4173
 ```
 
 本地审计数据会写入 `.openchainclaw/`，演示工作区会写入 `data/workspace/`。这两个目录都不会进入版本库。
+
+## 可选 PostHog Analytics
+
+服务端 analytics 默认关闭。如需启用，在启动本地控制台前设置环境变量：
+
+```bash
+POSTHOG_PROJECT_API_KEY=phc_xxx POSTHOG_HOST=https://us.i.posthog.com pnpm start
+```
+
+`pnpm start` 会在 `.env` 存在时自动读取它。你可以复制 `.env.example`，并设置 `POSTHOG_PROJECT_API_KEY` 或 `POSTHOG_PROJECT_TOKEN`。
+
+当前采集的事件包括演示任务创建、演示任务启动、高风险操作批准或拒绝、文件回滚完成，以及服务端异常。事件属性只包含 ID、状态、数量和安全元数据；不会发送原始提示词、文件内容、接口请求正文、令牌、私钥或浏览器身份凭据。
 
 ## 原型演示流程
 

@@ -1,8 +1,20 @@
-const path = require("node:path");
+import path from "node:path";
+
+export type RiskLevel = "Low" | "Medium" | "High" | "Blocked";
+
+export interface RiskAssessment {
+  level: RiskLevel;
+  reason: string;
+}
+
+export interface ApiCallRiskInput {
+  paid?: boolean;
+  sensitiveTransfer?: boolean;
+}
 
 const SENSITIVE_NAME_PATTERN = /(^|[-_.])(private|secret|token|cookie|credential|mnemonic|id_rsa|id_ed25519|wallet|seed)([-_.]|$)/i;
 
-function normalizeUrlHost(url) {
+export function normalizeUrlHost(url: string): string {
   try {
     return new URL(url).hostname.toLowerCase();
   } catch {
@@ -10,30 +22,30 @@ function normalizeUrlHost(url) {
   }
 }
 
-function hasHiddenSegment(filePath) {
+function hasHiddenSegment(filePath: string): boolean {
   return path
     .normalize(filePath)
     .split(path.sep)
     .some((segment) => segment.length > 1 && segment.startsWith("."));
 }
 
-function isSensitiveFile(filePath) {
+function isSensitiveFile(filePath: string): boolean {
   const baseName = path.basename(filePath);
   return SENSITIVE_NAME_PATTERN.test(baseName);
 }
 
-function isInsideDirectory(targetPath, directoryPath) {
+function isInsideDirectory(targetPath: string, directoryPath: string): boolean {
   const target = path.resolve(targetPath);
   const directory = path.resolve(directoryPath);
   const relative = path.relative(directory, target);
   return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
 }
 
-function isAuthorizedPath(targetPath, allowedDirectories) {
+export function isAuthorizedPath(targetPath: string, allowedDirectories: string[]): boolean {
   return allowedDirectories.some((directory) => isInsideDirectory(targetPath, directory));
 }
 
-function assessFileRead(targetPath, allowedDirectories) {
+export function assessFileRead(targetPath: string, allowedDirectories: string[]): RiskAssessment {
   if (hasHiddenSegment(targetPath)) {
     return {
       level: "Blocked",
@@ -61,7 +73,7 @@ function assessFileRead(targetPath, allowedDirectories) {
   };
 }
 
-function assessFileModify(targetPath, allowedDirectories) {
+export function assessFileModify(targetPath: string, allowedDirectories: string[]): RiskAssessment {
   const readAssessment = assessFileRead(targetPath, allowedDirectories);
 
   if (readAssessment.level === "Blocked") {
@@ -78,7 +90,7 @@ function assessFileModify(targetPath, allowedDirectories) {
   };
 }
 
-function assessWebVisit(url, whitelist) {
+export function assessWebVisit(url: string, whitelist: string[]): RiskAssessment {
   const host = normalizeUrlHost(url);
   const matched = whitelist.some((entry) => entry.toLowerCase() === host);
 
@@ -95,7 +107,7 @@ function assessWebVisit(url, whitelist) {
   };
 }
 
-function assessApiCall({ paid = false, sensitiveTransfer = false } = {}) {
+export function assessApiCall({ paid = false, sensitiveTransfer = false }: ApiCallRiskInput = {}): RiskAssessment {
   if (paid) {
     return {
       level: "High",
@@ -115,12 +127,3 @@ function assessApiCall({ paid = false, sensitiveTransfer = false } = {}) {
     reason: "普通 API 调用，可执行但必须记录脱敏元数据"
   };
 }
-
-module.exports = {
-  assessApiCall,
-  assessFileModify,
-  assessFileRead,
-  assessWebVisit,
-  isAuthorizedPath,
-  normalizeUrlHost
-};

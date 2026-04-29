@@ -14,7 +14,7 @@ OpenChainClaw is a local-first, verifiable, and recoverable personal AI assistan
 
 ## Current Status
 
-The repository is at the `V0.1` local prototype stage. It already includes a no-dependency local console and a deterministic demo runtime.
+The repository is at the `V0.1` local prototype stage. It includes a local console, a deterministic demo runtime, a TypeScript/ESM Node runtime, and optional server-side PostHog event capture.
 
 Completed capabilities:
 
@@ -47,11 +47,16 @@ Architecture sources:
 
 ## Quickstart
 
-Requirement: `Node.js 20` or newer.
+Requirements:
+
+- `Node.js 22.22.0` or newer;
+- `pnpm 10.x`.
 
 ```bash
-npm test
-npm start
+pnpm install
+pnpm typecheck
+pnpm test
+pnpm start
 ```
 
 Then open:
@@ -61,6 +66,18 @@ http://127.0.0.1:4173
 ```
 
 Local audit data is written to `.openchainclaw/`. The demo workspace is written to `data/workspace/`. Both directories are ignored by git.
+
+## Optional PostHog Analytics
+
+Server-side analytics are disabled by default. To enable them, set environment variables before starting the local console:
+
+```bash
+POSTHOG_PROJECT_API_KEY=phc_xxx POSTHOG_HOST=https://us.i.posthog.com pnpm start
+```
+
+`pnpm start` also reads `.env` automatically when the file exists. You can copy `.env.example` and set either `POSTHOG_PROJECT_API_KEY` or `POSTHOG_PROJECT_TOKEN`.
+
+Captured events currently cover demo task creation, demo task start, high-risk approval or rejection, file rollback completion, and server exceptions. Event properties use IDs, statuses, counts, and safe metadata only; raw prompts, file content, API request bodies, tokens, private keys, and browser credentials are not sent.
 
 ## Prototype Walkthrough
 

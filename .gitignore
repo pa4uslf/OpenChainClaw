@@ -6,6 +6,8 @@
 # Editor and local tooling
 .idea/
 .vscode/
+.claude/
+.posthog-events.json
 *.swp
 *.swo
 
@@ -27,6 +29,7 @@ temp/
 
 # Node / web app artifacts
 node_modules/
+package-lock.json
 dist/
 build/
 .next/
@@ -55,3 +58,4 @@ docs/ROADMAP*.md
 docs/TODO*.md
 docs/TECH_STACK_DECISION.md
 docs/MIGRATION_CHECKLIST.md
+docs/posthog_node.md
