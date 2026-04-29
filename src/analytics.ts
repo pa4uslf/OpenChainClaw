@@ -1,5 +1,13 @@
 import { PostHog } from "posthog-node";
 
+export const ANALYTICS_EVENTS = {
+  taskCreated: "task created",
+  taskDemoStarted: "task demo started",
+  highRiskOperationApproved: "high risk operation approved",
+  highRiskOperationRejected: "high risk operation rejected",
+  fileRollbackCompleted: "file rollback completed"
+} as const;
+
 export interface AnalyticsEvent {
   distinctId?: string;
   event: string;
@@ -16,6 +24,76 @@ export interface AnalyticsConfig {
   enabled: boolean;
   distinctId: string;
   host: string;
+}
+
+const UNSAFE_PROPERTY_FRAGMENTS = [
+  "api_key",
+  "authorization",
+  "browser_credential",
+  "content",
+  "cookie",
+  "credential",
+  "file_path",
+  "headers",
+  "local_path",
+  "password",
+  "private_key",
+  "raw_diff",
+  "request_body",
+  "secret",
+  "token"
+];
+
+function normalizePropertyKey(key: string): string {
+  return key.trim().toLowerCase().replace(/[\s-]+/g, "_");
+}
+
+function isSafeDerivedPromptKey(key: string): boolean {
+  return key === "prompt_length" || key.endsWith("_prompt_length");
+}
+
+function isSafeDerivedBodyKey(key: string): boolean {
+  return key === "body_shape" || key.endsWith("_body_shape");
+}
+
+function isUnsafeAnalyticsPropertyKey(key: string): boolean {
+  const normalized = normalizePropertyKey(key);
+
+  if (normalized.includes("prompt") && !isSafeDerivedPromptKey(normalized)) {
+    return true;
+  }
+
+  if (normalized.includes("body") && !isSafeDerivedBodyKey(normalized)) {
+    return true;
+  }
+
+  return UNSAFE_PROPERTY_FRAGMENTS.some((fragment) => normalized.includes(fragment));
+}
+
+function sanitizeAnalyticsValue(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    return value.map((entry) => sanitizeAnalyticsValue(entry));
+  }
+
+  if (!value || typeof value !== "object" || value instanceof Date) {
+    return value;
+  }
+
+  return sanitizeAnalyticsProperties(value as Record<string, unknown>);
+}
+
+export function sanitizeAnalyticsProperties(properties: Record<string, unknown> = {}): Record<string, unknown> {
+  const safeProperties: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(properties)) {
+    if (isUnsafeAnalyticsPropertyKey(key)) {
+      continue;
+    }
+
+    safeProperties[key] = sanitizeAnalyticsValue(value);
+  }
+
+  return safeProperties;
 }
 
 export class Analytics {
@@ -36,7 +114,7 @@ export class Analytics {
       distinctId: distinctId || this.config.distinctId,
       event,
       properties: {
-        ...properties,
+        ...sanitizeAnalyticsProperties(properties),
         $process_person_profile: false
       }
     });
@@ -48,7 +126,7 @@ export class Analytics {
     }
 
     this.client.captureException(error, this.config.distinctId, {
-      ...properties,
+      ...sanitizeAnalyticsProperties(properties),
       $process_person_profile: false
     });
   }

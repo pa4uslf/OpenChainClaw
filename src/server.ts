@@ -2,7 +2,7 @@ import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { createAnalytics, type Analytics } from "./analytics.js";
+import { ANALYTICS_EVENTS, createAnalytics, type Analytics } from "./analytics.js";
 import { OpenChainClawRuntime, type RuntimeOptions } from "./runtime.js";
 
 const PORT = Number(process.env.PORT || 4173);
@@ -134,7 +134,7 @@ async function handleApi(request: IncomingMessage, response: ServerResponse, ana
 
     const task = await runtime.createTask({ prompt });
     analyticsClient.capture({
-      event: "task created",
+      event: ANALYTICS_EVENTS.taskCreated,
       properties: {
         task_id: task.task_id,
         prompt_length: prompt.length
@@ -143,7 +143,7 @@ async function handleApi(request: IncomingMessage, response: ServerResponse, ana
 
     const startedTask = await runtime.startDemoTask(task.task_id);
     analyticsClient.capture({
-      event: "task demo started",
+      event: ANALYTICS_EVENTS.taskDemoStarted,
       properties: {
         task_id: startedTask.task_id,
         status: startedTask.status,
@@ -168,7 +168,9 @@ async function handleApi(request: IncomingMessage, response: ServerResponse, ana
       const decision = body.decision === "rejected" ? "rejected" : "approved";
       const task = await runtime.resolvePendingOperation(taskId, decision);
       analyticsClient.capture({
-        event: decision === "approved" ? "high risk operation approved" : "high risk operation rejected",
+        event: decision === "approved"
+          ? ANALYTICS_EVENTS.highRiskOperationApproved
+          : ANALYTICS_EVENTS.highRiskOperationRejected,
         properties: {
           task_id: taskId,
           status: task.status,
@@ -189,7 +191,7 @@ async function handleApi(request: IncomingMessage, response: ServerResponse, ana
       await runtime.rollbackFile(taskId, operationId);
       const task = await runtime.loadTask(taskId);
       analyticsClient.capture({
-        event: "file rollback completed",
+        event: ANALYTICS_EVENTS.fileRollbackCompleted,
         properties: {
           task_id: taskId,
           operation_id: operationId,

@@ -79,6 +79,8 @@ POSTHOG_PROJECT_API_KEY=phc_xxx POSTHOG_HOST=https://us.i.posthog.com pnpm start
 
 当前采集的事件包括演示任务创建、演示任务启动、高风险操作批准或拒绝、文件回滚完成，以及服务端异常。事件属性只包含 ID、状态、数量和安全元数据；不会发送原始提示词、文件内容、接口请求正文、令牌、私钥或浏览器身份凭据。
 
+事件目录、验证命令和后续新增事件的隐私规则见 [Analytics](docs/analytics.md)。
+
 ## 原型演示流程
 
 运行本地控制台后，可以用默认任务体验当前原型：

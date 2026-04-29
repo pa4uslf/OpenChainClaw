@@ -79,6 +79,8 @@ POSTHOG_PROJECT_API_KEY=phc_xxx POSTHOG_HOST=https://us.i.posthog.com pnpm start
 
 Captured events currently cover demo task creation, demo task start, high-risk approval or rejection, file rollback completion, and server exceptions. Event properties use IDs, statuses, counts, and safe metadata only; raw prompts, file content, API request bodies, tokens, private keys, and browser credentials are not sent.
 
+See [Analytics](docs/analytics.md) for the event catalog, smoke-test commands, and privacy rules for adding new events.
+
 ## Prototype Walkthrough
 
 After starting the local console, use the default task to try the current prototype:

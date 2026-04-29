@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { Analytics, createAnalytics, type AnalyticsClient } from "../src/analytics.js";
+import { Analytics, createAnalytics, sanitizeAnalyticsProperties, type AnalyticsClient } from "../src/analytics.js";
 
 class FakePostHogClient implements AnalyticsClient {
   captures: Array<{ distinctId: string; event: string; properties?: Record<string, unknown> }> = [];
@@ -70,6 +70,55 @@ test("analytics capture adds a default distinct ID and avoids person profiles", 
   assert.equal(fakeClient.captures[0]?.event, "task created");
   assert.equal(fakeClient.captures[0]?.properties?.task_id, "task_123");
   assert.equal(fakeClient.captures[0]?.properties?.$process_person_profile, false);
+});
+
+test("analytics capture drops unsafe property names before sending events", () => {
+  const fakeClient = new FakePostHogClient();
+  const analytics = new Analytics(
+    {
+      enabled: true,
+      distinctId: "local-user",
+      host: "https://us.i.posthog.com"
+    },
+    fakeClient
+  );
+
+  analytics.capture({
+    event: "task created",
+    properties: {
+      task_id: "task_123",
+      prompt: "raw user request",
+      prompt_length: 16,
+      metadata: {
+        request_body: "raw payload",
+        body_shape: ["name"]
+      },
+      api_key: "phc_secret",
+      file_path: "/Users/frank/private.txt"
+    }
+  });
+
+  assert.deepEqual(fakeClient.captures[0]?.properties, {
+    task_id: "task_123",
+    prompt_length: 16,
+    metadata: {
+      body_shape: ["name"]
+    },
+    $process_person_profile: false
+  });
+});
+
+test("sanitizeAnalyticsProperties does not mutate the input object", () => {
+  const properties = {
+    task_id: "task_123",
+    token: "secret"
+  };
+
+  assert.deepEqual(sanitizeAnalyticsProperties(properties), { task_id: "task_123" });
+  assert.deepEqual(properties, {
+    task_id: "task_123",
+    token: "secret"
+  });
 });
 
 test("analytics exception capture uses the configured distinct ID", () => {

@@ -29,3 +29,5 @@ Recent history uses short imperative subjects, often with a conventional prefix 
 ## Security & Configuration Tips
 
 Do not commit `.env`, private keys, `.openchainclaw/`, `data/`, snapshots, audit logs, PostHog project keys, `.claude/`, or local-only planning docs. Raw audit logs stay local by default; verifiable records should contain hashes, indexes, timestamps, and risk summaries rather than private raw content. PostHog integration must stay opt-in via `POSTHOG_PROJECT_API_KEY` and must not send raw prompts, file content, API bodies, tokens, private keys, or browser credentials.
+
+When changing user flows or adding product behavior that should be observable, actively consider whether a PostHog event is useful. If adding or changing analytics, use the wrapper in `src/analytics.ts` instead of calling the PostHog client directly, keep event properties to safe metadata, update `docs/analytics.md`, and add or adjust analytics privacy tests. Before commit or push, verify `.env`, `.posthog-events.json`, local runtime data, and local-only planning docs remain ignored and unstaged.
