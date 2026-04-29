@@ -32,7 +32,7 @@ OpenChainClaw 是一个本地优先、可验证、可回溯的个人智能助手
 - 真实模型规划和执行循环；
 - 真实网页自动化和网页内容提取；
 - 真实外部接口调用；
-- 通过可信即时通讯渠道在手机上控制本地智能助手；
+- 通过可信即时通讯渠道在手机上进行通知和有限控制；
 - 可选钱包连接和钱包签名确认；
 - 可验证证明提交。
 
@@ -103,6 +103,7 @@ POSTHOG_PROJECT_API_KEY=phc_xxx POSTHOG_HOST=https://us.i.posthog.com pnpm start
 - 回滚操作本身也会进入审计记录。
 - 可验证记录只保存哈希、索引、时间戳和风险摘要。
 - 原始文件内容、接口请求正文、令牌、私钥和浏览器身份凭据不上链。
+- 手机端即时通讯渠道一律视为外部控制面：可承载通知、短命令和确认摘要，但原始任务内容和高权限执行必须继续本地优先。
 
 ## 项目路线图
 
@@ -118,13 +119,15 @@ POSTHOG_PROJECT_API_KEY=phc_xxx POSTHOG_HOST=https://us.i.posthog.com pnpm start
 
 OpenChainClaw 会先打磨本地控制台和小型可信运行时。审计模型成熟后，未来版本可以逐步扩展到：
 
-- 通过 Telegram、Signal、Discord、Slack 或其他用户批准的即时通讯渠道在手机上控制本地智能助手；
+- 通过 Telegram、Signal、Discord、Slack 或其他用户批准的即时通讯渠道在手机上进行通知和有限控制；
 - 可信启动向导，帮助用户更安全地完成首次配置；
 - 面向开发者工作流和个人知识库的更多工具连接器；
 - 更丰富的证明后端和验证查看体验；
 - 在本地控制台体验稳定后，再考虑可选伴侣应用。
 
 这些扩展仍应遵循同一组安全默认值：日志本地优先、高风险操作显式确认、文件修改可恢复、原始隐私数据不上链。
+
+任何 Telegram、Signal、Discord、Slack、微信、飞书或类似适配器启用前，都应先满足 [Mobile IM Control Safety Model](docs/mobile-im-control.md) 中的安全约束。
 
 ## 许可证
 

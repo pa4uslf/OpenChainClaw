@@ -32,7 +32,7 @@ Next areas under exploration:
 - real model planning and execution loop;
 - real browser automation and webpage extraction;
 - real external API execution;
-- mobile control surfaces through trusted messaging channels;
+- mobile notification and limited control surfaces through trusted messaging channels;
 - optional wallet connection and signature approval;
 - verifiable proof submission.
 
@@ -103,6 +103,7 @@ This walkthrough validates transparent audit trails, risk blocking, snapshots, r
 - Rollback actions are also recorded in the audit trail.
 - Verifiable records store only hashes, indexes, timestamps, and risk summaries.
 - Raw file content, API request bodies, tokens, private keys, and browser credentials are not written on-chain.
+- Mobile messaging channels are treated as external control surfaces: they may carry notifications, short commands, and approval summaries, but raw task content and privileged execution stay local-first.
 
 ## Project Roadmap
 
@@ -118,13 +119,15 @@ This walkthrough validates transparent audit trails, risk blocking, snapshots, r
 
 OpenChainClaw starts with a local console and a small trusted runtime. As the audit model matures, future versions may expand into:
 
-- mobile control through messaging channels such as Telegram, Signal, Discord, Slack, or other user-approved IM surfaces;
+- mobile notification and limited control through messaging channels such as Telegram, Signal, Discord, Slack, or other user-approved IM surfaces;
 - guided setup for safer first-run configuration;
 - additional tool connectors for developer workflows and personal knowledge bases;
 - richer proof backends and verification explorers;
 - optional companion apps when the local console experience is stable.
 
 These extensions should preserve the same safety defaults: local-first logs, explicit approval for high-risk actions, recoverable file changes, and no raw private data on-chain.
+
+See [Mobile IM Control Safety Model](docs/mobile-im-control.md) for the design constraints that apply before any Telegram, Signal, Discord, Slack, WeChat, Feishu, or similar adapter is enabled.
 
 ## License
 

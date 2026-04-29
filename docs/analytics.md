@@ -74,3 +74,24 @@ Never send:
 - local filesystem paths when a stable ID or hash is enough.
 
 The analytics wrapper drops property keys that look like raw prompts, content, request bodies, credentials, secrets, or tokens before sending events. Keep new events inside the same convention instead of calling the PostHog client directly from feature code.
+
+## Mobile Messaging Events
+
+Mobile messaging adapters, including future Telegram, Signal, Discord, Slack, WeChat, Feishu, or similar integrations, must follow a stricter rule: analytics may describe control-plane behavior, never message content.
+
+Allowed properties:
+
+- `channel_type`, for example `telegram` or `signal`;
+- `operation_id`, `task_id`, and stable local IDs;
+- command category, such as `status_check`, `approve`, or `reject`;
+- risk level, approval state, and execution status;
+- counts, lengths, hashes, and coarse timestamps.
+
+Never send:
+
+- raw mobile messages;
+- chat titles, group names, usernames, phone numbers, or message URLs;
+- raw task prompts, model responses, file content, diffs, API bodies, or extracted webpage content;
+- bot tokens, webhook secrets, cookies, session data, or authorization headers.
+
+If a mobile adapter needs richer diagnostics, write them to local audit logs first and export only redacted metadata through the analytics wrapper.
