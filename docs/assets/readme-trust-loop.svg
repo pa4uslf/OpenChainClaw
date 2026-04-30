@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520" role="img" aria-labelledby="title desc">
+  <title id="title">OpenChainClaw trust loop</title>
+  <desc id="desc">A local-first task loop from user intent to runtime execution, risk approval, audit records, rollback, and proof verification.</desc>
+  <rect width="1120" height="520" fill="#f7f8fb"/>
+  <rect x="38" y="38" width="1044" height="444" rx="22" fill="#ffffff" stroke="#d8dee9" stroke-width="2"/>
+  <text x="72" y="92" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700" fill="#111827">Transparent assistant execution loop</text>
+  <text x="72" y="124" font-family="Inter, Arial, sans-serif" font-size="17" fill="#4b5563">Local execution stays reviewable, recoverable, and independently verifiable.</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#4f46e5"/>
+    </marker>
+    <style>
+      .card { fill: #ffffff; stroke: #c7d2fe; stroke-width: 2; }
+      .title { font: 700 20px Inter, Arial, sans-serif; fill: #111827; }
+      .body { font: 15px Inter, Arial, sans-serif; fill: #4b5563; }
+      .small { font: 13px Inter, Arial, sans-serif; fill: #6b7280; }
+      .arrow { stroke: #4f46e5; stroke-width: 3; fill: none; marker-end: url(#arrow); }
+    </style>
+  </defs>
+
+  <rect class="card" x="76" y="176" width="184" height="112" rx="14"/>
+  <text class="title" x="102" y="216">User intent</text>
+  <text class="body" x="102" y="244">Create a local task</text>
+  <text class="small" x="102" y="268">Prompt stays reviewable</text>
+
+  <rect class="card" x="328" y="176" width="184" height="112" rx="14"/>
+  <text class="title" x="354" y="216">Local runtime</text>
+  <text class="body" x="354" y="244">Files, web, APIs</text>
+  <text class="small" x="354" y="268">Actions become events</text>
+
+  <rect class="card" x="580" y="176" width="184" height="112" rx="14"/>
+  <text class="title" x="606" y="216">Risk gate</text>
+  <text class="body" x="606" y="244">Pause before risk</text>
+  <text class="small" x="606" y="268">Approve or reject</text>
+
+  <rect class="card" x="832" y="176" width="184" height="112" rx="14"/>
+  <text class="title" x="858" y="216">Audit trail</text>
+  <text class="body" x="858" y="244">Timeline and hashes</text>
+  <text class="small" x="858" y="268">Raw data stays local</text>
+
+  <rect x="202" y="350" width="216" height="86" rx="14" fill="#f0fdf4" stroke="#86efac" stroke-width="2"/>
+  <text x="230" y="384" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="700" fill="#14532d">Recover</text>
+  <text x="230" y="412" font-family="Inter, Arial, sans-serif" font-size="15" fill="#166534">Snapshot, diff, rollback</text>
+
+  <rect x="702" y="350" width="216" height="86" rx="14" fill="#fff7ed" stroke="#fdba74" stroke-width="2"/>
+  <text x="730" y="384" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="700" fill="#7c2d12">Verify</text>
+  <text x="730" y="412" font-family="Inter, Arial, sans-serif" font-size="15" fill="#9a3412">Proof metadata, not content</text>
+
+  <path class="arrow" d="M260 232 H318"/>
+  <path class="arrow" d="M512 232 H570"/>
+  <path class="arrow" d="M764 232 H822"/>
+  <path class="arrow" d="M420 288 C420 326 370 334 330 350"/>
+  <path class="arrow" d="M924 288 C924 326 872 334 830 350"/>
+  <path class="arrow" d="M702 393 H428"/>
+</svg>

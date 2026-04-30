@@ -4,6 +4,8 @@
 
 OpenChainClaw is a local-first, verifiable, and recoverable personal AI assistant prototype. The project does not start by chasing stronger autonomous execution. It first tests whether users will choose an assistant because its actions are transparent, interruptible, and independently verifiable.
 
+![OpenChainClaw trust loop](docs/assets/readme-trust-loop.svg)
+
 ## Product Positioning
 
 - The local web console creates tasks, shows timelines, handles risk approvals, and displays audit reports.
@@ -11,6 +13,18 @@ OpenChainClaw is a local-first, verifiable, and recoverable personal AI assistan
 - Raw audit logs stay local by default.
 - Verifiable records store only hashes, indexes, timestamps, and risk summaries, not private raw data.
 - Wallet support is optional. It is not required for core local use.
+
+## Documentation
+
+- [Project Blueprint](docs/PROJECT_BLUEPRINT.md): product thesis, capability layers, non-goals, and success signals.
+- [MVP Scope](docs/MVP_SCOPE.md): must-have, should-have, later, and out-of-scope boundaries.
+- [User Flows](docs/USER_FLOWS.md): task creation, risk approval, rollback, proof verification, setup, and mobile-control flows.
+- [Decision Record](docs/DECISIONS.md): durable product and engineering decisions.
+- [Security Model](docs/SECURITY_MODEL.md): trust boundaries, sensitive data classes, risk behavior, and proof rules.
+- [Analytics](docs/analytics.md): optional PostHog event catalog, verification commands, and privacy rules.
+- [Mobile IM Control Safety Model](docs/mobile-im-control.md): constraints for future messaging adapters.
+
+Local-only planning documents, private research, credentials, audit exports, and unpublished business material are intentionally excluded from git.
 
 ## Current Status
 
@@ -35,6 +49,19 @@ Next areas under exploration:
 - mobile notification and limited control surfaces through trusted messaging channels;
 - optional wallet connection and signature approval;
 - verifiable proof submission.
+
+## Trust Loop
+
+OpenChainClaw is designed around a small loop:
+
+1. the user starts a local task;
+2. the runtime records each critical operation;
+3. risky actions pause before execution;
+4. file mutations create snapshots and diffs;
+5. rollback is available for supported changes;
+6. local audit hashes and proof metadata make the record checkable.
+
+The proof layer is deliberately narrow. It should help verify the local audit record without copying private task data into analytics, public documents, or external proof systems.
 
 ## Architecture
 

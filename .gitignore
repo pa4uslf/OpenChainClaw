@@ -26,6 +26,21 @@ temp/
 *.key
 *.p12
 *.pfx
+*.crt
+*.cer
+*.der
+*.asc
+*.gpg
+*.age
+*.secret
+*.secrets
+*.token
+*.tokens
+*.credentials
+*.credentials.*
+secrets/
+private/
+credentials/
 
 # Node / web app artifacts
 node_modules/
@@ -51,6 +66,10 @@ __pycache__/
 data/
 snapshots/
 audit-logs/
+audit-exports/
+proof-exports/
+local-ledger/
+task-history/
 
 # Local-only product documents
 docs/PRD.md
@@ -59,3 +78,43 @@ docs/TODO*.md
 docs/TECH_STACK_DECISION.md
 docs/MIGRATION_CHECKLIST.md
 docs/posthog_node.md
+docs/private/
+docs/local/
+docs/research-private/
+docs/*PRIVATE*
+docs/*Private*
+docs/*private*
+docs/*CONFIDENTIAL*
+docs/*Confidential*
+docs/*confidential*
+docs/*SECRET*
+docs/*Secret*
+docs/*secret*
+docs/*CUSTOMER*
+docs/*Customer*
+docs/*customer*
+docs/*BUSINESS*
+docs/*Business*
+docs/*business*
+docs/*FINANCIAL*
+docs/*Financial*
+docs/*financial*
+docs/*PRICING*
+docs/*Pricing*
+docs/*pricing*
+
+# Private planning, research, and exports
+PRIVATE*
+private-*
+CONFIDENTIAL*
+confidential-*
+customer-*
+customers-*
+pricing-*
+financial-*
+business-plan*
+strategy-private*
+research-private*
+*.local.md
+*.private.md
+*.confidential.md
