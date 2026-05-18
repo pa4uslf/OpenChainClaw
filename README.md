@@ -50,6 +50,10 @@ Next areas under exploration:
 - optional wallet connection and signature approval;
 - verifiable proof submission.
 
+Public backlog:
+
+- Study mature local-console app shell patterns, using LobeHub as a reference for startup loading states, safe server-injected bootstrap configuration, mobile and desktop layout variants, and productized runtime health surfaces, while keeping OpenChainClaw on the planned Vite + vanilla TypeScript path instead of adopting Next.js or React prematurely.
+
 ## Trust Loop
 
 OpenChainClaw is designed around a small loop:
