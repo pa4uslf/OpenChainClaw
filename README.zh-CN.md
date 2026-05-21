@@ -50,6 +50,10 @@ OpenChainClaw 是一个本地优先、可验证、可回溯的个人智能助手
 - 可选钱包连接和钱包签名确认；
 - 可验证证明提交。
 
+公开待办：
+
+- 研究成熟本地控制台应用的 app shell 模式，以 LobeHub 为参考，借鉴启动加载状态、安全的服务端启动配置注入、移动端和桌面端布局变体，以及产品化的运行时健康状态展示；同时保持 OpenChainClaw 既定的 Vite + 原生 TypeScript 路线，不提前引入 Next.js 或 React。
+
 ## 信任闭环
 
 OpenChainClaw 围绕一个很小的闭环设计：
