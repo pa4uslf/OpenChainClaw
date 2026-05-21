@@ -1,0 +1,22 @@
+assistant: codex
+
+assistants:
+  codex:
+    model: gpt-5.3-codex
+    modelReasoningEffort: high
+    webSearchMode: disabled
+
+commands:
+  folder: .archon/commands
+  autoLoad: true
+
+worktree:
+  baseBranch: master
+  initSubmodules: false
+
+docs:
+  path: docs
+
+defaults:
+  loadDefaultCommands: true
+  loadDefaultWorkflows: true

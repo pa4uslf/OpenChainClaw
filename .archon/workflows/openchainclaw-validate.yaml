@@ -1,0 +1,95 @@
+name: openchainclaw-validate
+description: |
+  Use when: validating OpenChainClaw changes before commit, push, or PR.
+  Does: loads project context, runs deterministic typecheck/test checks, verifies private/local-only files are not tracked, and summarizes the result.
+  NOT for: implementing features or creating PRs.
+
+provider: codex
+model: gpt-5.3-codex
+modelReasoningEffort: high
+webSearchMode: disabled
+worktree:
+  enabled: false
+
+nodes:
+  - id: context
+    command: openchainclaw-project-context
+    context: fresh
+
+  - id: validation
+    bash: |
+      set -euo pipefail
+      {
+        echo "# OpenChainClaw Validation"
+        echo
+        echo "**Generated**: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+        echo "**Workflow ID**: $WORKFLOW_ID"
+        echo
+        echo "## Commands"
+      } > "$ARTIFACTS_DIR/openchainclaw-validation.md"
+
+      echo "- pnpm typecheck" >> "$ARTIFACTS_DIR/openchainclaw-validation.md"
+      pnpm typecheck
+      echo "  - result: PASS" >> "$ARTIFACTS_DIR/openchainclaw-validation.md"
+
+      echo "- pnpm test" >> "$ARTIFACTS_DIR/openchainclaw-validation.md"
+      pnpm test
+      echo "  - result: PASS" >> "$ARTIFACTS_DIR/openchainclaw-validation.md"
+    depends_on: [context]
+
+  - id: privacy-gate
+    bash: |
+      set -euo pipefail
+      PRIVATE_PATHS=(
+        ".env"
+        ".posthog-events.json"
+        ".openchainclaw"
+        "data"
+        "dist"
+        "docs/PRD.md"
+        "docs/ROADMAP.en.md"
+        "docs/ROADMAP.zh-CN.md"
+        "docs/TODO.en.md"
+        "docs/TODO.zh-CN.md"
+        "docs/TECH_STACK_DECISION.md"
+        "docs/MIGRATION_CHECKLIST.md"
+        "docs/posthog_node.md"
+      )
+
+      {
+        echo "# OpenChainClaw Privacy Gate"
+        echo
+        echo "**Generated**: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+        echo
+        echo "## Tracked private/local-only path check"
+      } > "$ARTIFACTS_DIR/openchainclaw-privacy-gate.md"
+
+      FAILED=0
+      for path in "${PRIVATE_PATHS[@]}"; do
+        if git ls-files -- "$path" | grep -q .; then
+          echo "- FAIL: $path is tracked" | tee -a "$ARTIFACTS_DIR/openchainclaw-privacy-gate.md"
+          FAILED=1
+        else
+          echo "- PASS: $path is not tracked" >> "$ARTIFACTS_DIR/openchainclaw-privacy-gate.md"
+        fi
+      done
+
+      if [ "$FAILED" -ne 0 ]; then
+        echo "Private/local-only files are tracked. Stop before commit or PR." >&2
+        exit 1
+      fi
+    depends_on: [validation]
+
+  - id: summary
+    prompt: |
+      Summarize OpenChainClaw validation results for the user.
+
+      Read:
+      - $ARTIFACTS_DIR/openchainclaw-context.md
+      - $ARTIFACTS_DIR/openchainclaw-validation.md
+      - $ARTIFACTS_DIR/openchainclaw-privacy-gate.md
+
+      Keep the response concise. Lead with pass/fail status, then list commands run and any remaining risks.
+    depends_on: [privacy-gate]
+    context: fresh
+    allowed_tools: []

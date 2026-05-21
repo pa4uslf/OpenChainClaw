@@ -94,6 +94,19 @@ http://127.0.0.1:4173
 
 Local audit data is written to `.openchainclaw/`. The demo workspace is written to `data/workspace/`. Both directories are ignored by git.
 
+## Archon Workflows
+
+This repo includes project-local Archon workflows under `.archon/` for longer implementation and validation runs.
+
+```bash
+archon workflow list
+archon validate workflows
+archon workflow run openchainclaw-validate --no-worktree "pre-commit validation"
+archon workflow run openchainclaw-plan-to-pr --branch feature/example "docs/PLAN.md"
+```
+
+The workflows keep bundled Archon defaults enabled, use `master` as the base branch, run `pnpm typecheck` and `pnpm test`, and block PR finalization if private/local-only files such as `.env`, `.openchainclaw/`, `data/`, generated `dist/`, or local planning docs become tracked.
+
 ## Optional PostHog Analytics
 
 Server-side analytics are disabled by default. To enable them, set environment variables before starting the local console:

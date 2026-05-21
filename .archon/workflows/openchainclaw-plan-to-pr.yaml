@@ -1,0 +1,119 @@
+name: openchainclaw-plan-to-pr
+description: |
+  Use when: executing an existing OpenChainClaw plan, issue, or task description through implementation, validation, privacy checks, and PR finalization.
+  Input: Path to a plan file, a GitHub issue reference, or a concise task description.
+  Does: loads project context, prepares a scoped implementation brief, uses bundled Archon implementation commands, runs OpenChainClaw validation gates, then finalizes a PR.
+  NOT for: private planning docs publication, history rewrites, or quick one-line edits.
+
+provider: codex
+model: gpt-5.3-codex
+modelReasoningEffort: high
+webSearchMode: disabled
+
+nodes:
+  - id: context
+    command: openchainclaw-project-context
+    context: fresh
+
+  - id: implementation-brief
+    command: openchainclaw-implementation-brief
+    depends_on: [context]
+    context: fresh
+
+  - id: bridge-plan-artifact
+    bash: |
+      set -euo pipefail
+      if [ -f "$ARTIFACTS_DIR/plan.md" ]; then
+        echo "plan.md already exists"
+      elif [ -f "$ARTIFACTS_DIR/openchainclaw-implementation-brief.md" ]; then
+        cp "$ARTIFACTS_DIR/openchainclaw-implementation-brief.md" "$ARTIFACTS_DIR/plan.md"
+        echo "Copied openchainclaw-implementation-brief.md to plan.md"
+      else
+        echo "Missing implementation brief; cannot continue to archon-plan-setup" >&2
+        exit 1
+      fi
+    depends_on: [implementation-brief]
+
+  - id: plan-setup
+    command: archon-plan-setup
+    depends_on: [bridge-plan-artifact]
+    context: fresh
+
+  - id: confirm-plan
+    command: archon-confirm-plan
+    depends_on: [plan-setup]
+    context: fresh
+
+  - id: implement
+    command: archon-implement-tasks
+    depends_on: [confirm-plan]
+    context: fresh
+
+  - id: validation
+    bash: |
+      set -euo pipefail
+      {
+        echo "# OpenChainClaw Validation"
+        echo
+        echo "**Generated**: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+        echo "**Workflow ID**: $WORKFLOW_ID"
+        echo
+        echo "## Commands"
+      } > "$ARTIFACTS_DIR/openchainclaw-validation.md"
+
+      echo "- pnpm typecheck" >> "$ARTIFACTS_DIR/openchainclaw-validation.md"
+      pnpm typecheck
+      echo "  - result: PASS" >> "$ARTIFACTS_DIR/openchainclaw-validation.md"
+
+      echo "- pnpm test" >> "$ARTIFACTS_DIR/openchainclaw-validation.md"
+      pnpm test
+      echo "  - result: PASS" >> "$ARTIFACTS_DIR/openchainclaw-validation.md"
+    depends_on: [implement]
+
+  - id: privacy-gate
+    bash: |
+      set -euo pipefail
+      PRIVATE_PATHS=(
+        ".env"
+        ".posthog-events.json"
+        ".openchainclaw"
+        "data"
+        "dist"
+        "docs/PRD.md"
+        "docs/ROADMAP.en.md"
+        "docs/ROADMAP.zh-CN.md"
+        "docs/TODO.en.md"
+        "docs/TODO.zh-CN.md"
+        "docs/TECH_STACK_DECISION.md"
+        "docs/MIGRATION_CHECKLIST.md"
+        "docs/posthog_node.md"
+      )
+
+      {
+        echo "# OpenChainClaw Privacy Gate"
+        echo
+        echo "**Generated**: $(date '+%Y-%m-%d %H:%M:%S %Z')"
+        echo
+        echo "## Tracked private/local-only path check"
+      } > "$ARTIFACTS_DIR/openchainclaw-privacy-gate.md"
+
+      FAILED=0
+      for path in "${PRIVATE_PATHS[@]}"; do
+        if git ls-files -- "$path" | grep -q .; then
+          echo "- FAIL: $path is tracked" | tee -a "$ARTIFACTS_DIR/openchainclaw-privacy-gate.md"
+          FAILED=1
+        else
+          echo "- PASS: $path is not tracked" >> "$ARTIFACTS_DIR/openchainclaw-privacy-gate.md"
+        fi
+      done
+
+      if [ "$FAILED" -ne 0 ]; then
+        echo "Private/local-only files are tracked. Stop before commit or PR." >&2
+        exit 1
+      fi
+    depends_on: [validation]
+
+  - id: finalize-pr
+    command: archon-finalize-pr
+    depends_on: [privacy-gate]
+    context: fresh
