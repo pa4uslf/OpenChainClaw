@@ -14,6 +14,10 @@ OpenChainClaw is a TypeScript/ESM Node.js 22 local prototype. Runtime code lives
 - `OPENCHAINCLAW_DATA_DIR=/tmp/occ-data OPENCHAINCLAW_WORKSPACE_DIR=/tmp/occ-work pnpm start`: runs with isolated local data for manual testing.
 `pnpm start` reads `.env` automatically when present via Node's `--env-file-if-exists=.env`.
 
+## Archon Workflow Integration
+
+Use repo-local Archon workflows for longer, PR-shaped work. `.archon/config.yaml` sets `master` as the base branch, keeps bundled Archon defaults enabled, and uses Codex as the project assistant. `openchainclaw-validate` is the pre-commit/pre-PR gate; `openchainclaw-plan-to-pr` is for executing an existing plan or issue through implementation, validation, privacy checks, and PR finalization. Keep quick documentation edits and one-line fixes in the normal Codex flow unless the user asks for Archon.
+
 ## Coding Style & Naming Conventions
 
 Use TypeScript ESM modules, two-space indentation, semicolons, and double quotes, matching the existing `src/` style. Keep strict compiler settings enabled in `tsconfig.json`. Prefer small, explicit async functions over broad abstractions. Keep public API payload fields in snake_case when they represent audit records or UI-facing task data, for example `task_id`, `risk_level`, and `local_log_hash`. Use camelCase for internal TypeScript variables and functions.

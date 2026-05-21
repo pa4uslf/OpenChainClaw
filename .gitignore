@@ -7,6 +7,7 @@
 .idea/
 .vscode/
 .claude/
+.archon/state/
 .posthog-events.json
 *.swp
 *.swo
