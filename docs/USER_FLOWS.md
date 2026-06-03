@@ -88,6 +88,7 @@ The user can check whether local audit records still match their proof metadata.
 - Proof records do not contain raw prompts, file content, diffs, API bodies, credentials, or browser session material.
 - Hash recomputation can detect local record changes.
 - Proof status is explicit: local-only, queued, submitted, matched, mismatched, failed, or retrying.
+- Future external proof backends can prove policy compliance without exposing public task histories, raw credentials, or globally linkable relationship graphs.
 
 ## 5. Configure First-Run Safety
 

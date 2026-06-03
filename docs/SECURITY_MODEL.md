@@ -25,6 +25,8 @@ External services include websites, APIs, analytics providers, proof backends, w
 
 Proof records are verification metadata. They must not become a second copy of private task data.
 
+Future proof backends may also introduce agent identity, reputation, credential, or delegation records. Those records must be treated as privacy-sensitive even when they contain only metadata, because public linkage can reveal user intent, relationships, strategy, and recurring behavior.
+
 ## Default Protections
 
 - Raw audit logs stay local by default.
@@ -85,6 +87,8 @@ Proof records may include:
 - approval summaries;
 - status flags.
 
+When a proof backend supports richer trust semantics, the preferred shape is a policy proof: the verifier learns that a requirement was satisfied without receiving the raw credential, full identity history, full reputation trail, or complete delegation relationship.
+
 Proof records must not include:
 
 - raw prompts;
@@ -97,6 +101,8 @@ Proof records must not include:
 - cookies;
 - browser session material;
 - mobile chat content.
+
+Proof and reputation records should also avoid globally reusable identifiers when a context-specific identifier, nullifier, hash, or other non-linkable reference is enough to prevent replay or duplicate feedback.
 
 ## Analytics Rules
 

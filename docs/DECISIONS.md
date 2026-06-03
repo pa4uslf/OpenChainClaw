@@ -99,3 +99,22 @@ OpenChainClaw should be understandable to contributors and users while keeping p
 ### Impact
 
 Private planning documents must remain ignored. Public docs should summarize stable principles rather than copy local-only details.
+
+## ADR-008: Verifiability Does Not Require Public Identity Graphs
+
+### Decision
+
+Future proof, reputation, or agent identity integrations should prefer policy proofs, selective disclosure, and non-linkable context identifiers over public task histories or globally linkable agent relationship graphs.
+
+### Reason
+
+Agent trust systems can make behavior verifiable, but public identity, feedback, delegation, and interaction records can expose user intent, business relationships, strategy signals, and sensitive operational patterns.
+
+### Impact
+
+OpenChainClaw should treat emerging trust-agent standards and research, including ERC-8004-style agent registries and anonymous credential approaches such as ACTA, as design inputs rather than implementation commitments. Any external proof backend must preserve the local-first audit source, avoid raw private data, and avoid making cross-context linkage the default.
+
+References:
+
+- [ERC-8004: Trustless Agents](https://eips.ethereum.org/EIPS/eip-8004)
+- [Anonymous Credentials for Trustless Agents](https://ethresear.ch/t/anonymous-credentials-for-trustless-agents-acta/24797)

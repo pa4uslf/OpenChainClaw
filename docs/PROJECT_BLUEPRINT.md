@@ -35,6 +35,7 @@ This means the product should optimize for:
 - local-first audit logs;
 - recoverable file changes;
 - verifiable proof records that avoid raw private data;
+- privacy-preserving proof patterns that avoid turning verification metadata into public relationship graphs;
 - optional wallet and external proof integrations, not mandatory Web3 onboarding.
 
 ## Capability Layers
@@ -59,6 +60,8 @@ File-changing actions must create snapshots before mutation. Users should be abl
 
 Proof records should make audit records independently checkable without publishing raw private content. They should store hashes, indexes, timestamps, risk summaries, and approval summaries.
 
+As proof integrations mature, this layer should favor policy proofs and selective disclosure. A verifier should be able to confirm that a task, approval, credential, or agent policy satisfied a requirement without receiving the user's full task history, the agent's full relationship graph, or strategy-sensitive metadata.
+
 ### 6. External Control Surfaces
 
 Mobile messaging, wallet signing, browser automation, external APIs, and high-permission tools are treated as external or privileged surfaces. Each must declare what it can do, what it cannot do, and how it is audited.
@@ -82,6 +85,7 @@ These directions may be explored later only if they preserve local-first auditab
 - Make high-risk operations explicit before execution.
 - Prefer recoverable changes over silent mutation.
 - Store proof metadata, not private raw content.
+- Prefer policy proofs over public identity or reputation graphs.
 - Make wallet and remote integrations optional.
 - Add integrations only after their audit and rollback behavior is clear.
 - Keep public documentation free of private planning details, credentials, customer names, and unpublished business assumptions.
@@ -90,6 +94,7 @@ These directions may be explored later only if they preserve local-first auditab
 
 - The audit trail becomes too noisy for users to understand.
 - Proof records become decorative rather than useful for verification.
+- Proof or reputation records expose relationship graphs, delegation links, or strategy patterns even when raw content is excluded.
 - External control surfaces accidentally become privileged execution channels.
 - Local logs or analytics events leak private content.
 - Product scope expands before the core local runtime is trustworthy.

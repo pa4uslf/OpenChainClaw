@@ -57,6 +57,7 @@ A usable MVP must answer these questions:
 - write local verifiable records;
 - compare local records with proof metadata;
 - keep raw prompts, file contents, diffs, API bodies, tokens, private keys, cookies, and browser credentials out of external proof records.
+- preserve a path for future policy proofs or selective disclosure without requiring public task histories.
 
 ### Analytics Privacy
 
@@ -82,6 +83,7 @@ A usable MVP must answer these questions:
 - limited mobile approval summaries;
 - optional companion app;
 - additional proof backends;
+- privacy-preserving proof or reputation backends;
 - plugin or connector SDK;
 - team workflows;
 - enterprise compliance reports.
@@ -95,6 +97,7 @@ A usable MVP must answer these questions:
 - group chat control by default;
 - full enterprise access control;
 - multi-agent governance;
+- public agent identity, feedback, delegation, or reputation graphs that link a user's activity across contexts by default;
 - public publishing of private task histories;
 - broad background automation before approval, rollback, and audit behavior are stable.
 

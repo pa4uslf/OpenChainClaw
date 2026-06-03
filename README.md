@@ -49,6 +49,7 @@ Next areas under exploration:
 - mobile notification and limited control surfaces through trusted messaging channels;
 - optional wallet connection and signature approval;
 - verifiable proof submission.
+- privacy-preserving proof patterns such as policy proofs, selective disclosure, and non-linkable reputation signals.
 
 Public backlog:
 
@@ -65,7 +66,7 @@ OpenChainClaw is designed around a small loop:
 5. rollback is available for supported changes;
 6. local audit hashes and proof metadata make the record checkable.
 
-The proof layer is deliberately narrow. It should help verify the local audit record without copying private task data into analytics, public documents, or external proof systems.
+The proof layer is deliberately narrow. It should help verify the local audit record without copying private task data into analytics, public documents, or external proof systems. Future proof integrations should prefer policy proofs and selective disclosure over public identity graphs or public task histories.
 
 ## Architecture
 
@@ -167,6 +168,7 @@ OpenChainClaw starts with a local console and a small trusted runtime. As the au
 - guided setup for safer first-run configuration;
 - additional tool connectors for developer workflows and personal knowledge bases;
 - richer proof backends and verification explorers;
+- privacy-preserving proof and reputation backends that prove policy compliance without exposing raw identities, relationships, task histories, or strategy signals;
 - optional companion apps when the local console experience is stable.
 
 These extensions should preserve the same safety defaults: local-first logs, explicit approval for high-risk actions, recoverable file changes, and no raw private data on-chain.
